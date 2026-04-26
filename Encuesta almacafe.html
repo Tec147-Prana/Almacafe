@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Encuesta NPS – Almacafé</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1565C0;
+      --blue-light: #1976D2;
+      --blue-dark: #0D47A1;
+      --cream: #F5F0E8;
+      --cream-dark: #EDE7D9;
+      --text: #1a1a2e;
+      --text-muted: #5a6070;
+      --white: #ffffff;
+      --shadow: 0 8px 40px rgba(21, 101, 192, 0.12);
+      --radius: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      color: var(--text);
+    }
+
+    /* BG texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse 80% 50% at 10% 10%, rgba(21, 101, 192, 0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 60% at 90% 90%, rgba(21, 101, 192, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    /* HEADER */
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .logo-wrap {
+      background: #F5F0E8;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 28px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0;
+    }
+
+    .logo-wrap img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 24px;
+    }
+
+    /* Fallback logo if no img */
+    .logo-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: -1px;
+    }
+
+    .header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      font-weight: 700;
+      color: var(--blue-dark);
+      line-height: 1.2;
+      margin-bottom: 12px;
+    }
+
+    .header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-weight: 300;
+      max-width: 460px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* CARD */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 36px 40px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @media (max-width: 520px) {
+      .card {
+        padding: 24px 20px;
+      }
+    }
+
+    /* STEP INDICATOR */
+    .step-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 32px;
+      justify-content: center;
+    }
+
+    .step-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--cream-dark);
+      transition: all 0.3s;
+    }
+
+    .step-dot.active {
+      background: var(--blue);
+      width: 28px;
+      border-radius: 5px;
+    }
+
+    .step-dot.done {
+      background: var(--blue-light);
+    }
+
+    /* SECTION LABEL */
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
+
+    /* SEARCH SELECT */
+    .search-wrap {
+      position: relative;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      border: 2px solid var(--cream-dark);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    .search-wrap input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.08);
+      background: var(--white);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      right: 0;
+      background: var(--white);
+      border: 2px solid var(--cream-dark);
+      border-radius: 12px;
+      max-height: 260px;
+      overflow-y: auto;
+      z-index: 100;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+      display: none;
+    }
+
+    .dropdown.open {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 12px 18px;
+      cursor: pointer;
+      font-size: 0.93rem;
+      border-bottom: 1px solid var(--cream);
+      transition: background 0.15s;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: var(--cream);
+      color: var(--blue);
+    }
+
+    .dropdown-item.selected {
+      background: rgba(21, 101, 192, 0.07);
+      color: var(--blue);
+      font-weight: 500;
+    }
+
+    .dropdown-item mark {
+      background: rgba(21, 101, 192, 0.18);
+      color: var(--blue);
+      border-radius: 2px;
+      padding: 0 2px;
+    }
+
+    .selected-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(21, 101, 192, 0.08);
+      color: var(--blue-dark);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 0.92rem;
+      font-weight: 500;
+      margin-top: 12px;
+    }
+
+    .selected-badge button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--blue);
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* SERVICES TAGS */
+    .services-label {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+
+    .tags-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      background: var(--cream);
+      border: 1.5px solid var(--cream-dark);
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: default;
+    }
+
+    /* NPS QUESTION */
+    .nps-block {
+      margin-bottom: 28px;
+    }
+
+    .nps-question {
+      font-size: 0.97rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .nps-scale {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+    }
+
+    .nps-btn {
+      flex: 1;
+      min-width: 28px;
+      height: 48px;
+      border: 2px solid var(--cream-dark);
+      border-radius: 8px;
+      background: var(--cream);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    @media (max-width: 420px) {
+      .nps-scale {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+      }
+
+      .nps-btn {
+        height: 52px;
+        font-size: 1rem;
+        border-radius: 10px;
+        min-width: unset;
+      }
+
+      .nps-labels {
+        font-size: 0.68rem;
+      }
+
+      .container {
+        padding: 20px 14px 60px;
+      }
+
+      .card {
+        padding: 20px 16px;
+      }
+
+      .btn {
+        font-size: 0.95rem;
+        padding: 14px 16px;
+      }
+    }
+
+    .nps-btn:hover {
+      border-color: var(--blue-light);
+      color: var(--blue);
+      background: rgba(21, 101, 192, 0.06);
+    }
+
+    .nps-btn.selected {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: var(--white);
+      transform: scale(1.06);
+      box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+    }
+
+    .nps-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* OPEN QUESTION */
+    .open-q {
+      margin-bottom: 28px;
+    }
+
+    .open-q label {
+      display: block;
+      font-size: 0.97rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .open-q textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid var(--cream-dark);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: var(--cream);
+      resize: vertical;
+      min-height: 100px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .open-q textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 4px rgba(21, 101, 192, 0.08);
+      background: var(--white);
+    }
+
+    /* DIVIDER */
+    .divider {
+      height: 1px;
+      background: var(--cream-dark);
+      margin: 28px 0;
+    }
+
+    /* SERVICE HEADER */
+    .service-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .service-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .service-header h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .service-header small {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      margin-bottom: 28px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--cream-dark);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--blue-dark), var(--blue-light));
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+
+    /* BUTTONS */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 32px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 15px 24px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary {
+      background: var(--cream);
+      color: var(--text-muted);
+      border: 2px solid var(--cream-dark);
+      flex: 0 0 auto;
+      padding: 15px 20px;
+    }
+
+    .btn-secondary:hover {
+      background: var(--cream-dark);
+    }
+
+    .btn-primary {
+      background: var(--blue);
+      color: var(--white);
+      box-shadow: 0 4px 16px rgba(21, 101, 192, 0.3);
+    }
+
+    .btn-primary:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 6px 20px rgba(21, 101, 192, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* SUCCESS */
+    .success-card {
+      text-align: center;
+      padding: 60px 40px;
+    }
+
+    .success-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue-dark), var(--blue-light));
+      margin: 0 auto 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      animation: popIn 0.5s ease both;
+    }
+
+    .success-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      color: var(--blue-dark);
+    }
+
+    .success-card p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    /* ERROR */
+    .error-msg {
+      color: #c62828;
+      font-size: 0.83rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+
+      80% {
+        transform: scale(1.1);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .slide-in {
+      animation: fadeUp 0.4s ease both;
+    }
+
+    @keyframes slideOutLeft {
+      from {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      to {
+        opacity: 0;
+        transform: translateX(-40px);
+      }
+    }
+
+    @keyframes slideInRight {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    .q-slide-in {
+      animation: slideInRight 0.35s ease both;
+    }
+
+    .nps-neutral-below {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .nps-neutral-indicator {
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--blue);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: rgba(21, 101, 192, 0.08);
+      border: 1px solid rgba(21, 101, 192, 0.2);
+      border-radius: 20px;
+      padding: 3px 12px;
+    }
+
+    .already-banner {
+      background: rgba(21, 101, 192, 0.07);
+      border: 1.5px solid rgba(21, 101, 192, 0.2);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .already-banner .already-icon {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+    }
+
+    .already-banner h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--blue-dark);
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+    }
+
+    .already-banner p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .q-counter {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .q-counter-dots {
+      display: flex;
+      gap: 4px;
+    }
+
+    .q-counter-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--cream-dark);
+      transition: background 0.2s;
+    }
+
+    .q-counter-dot.done {
+      background: var(--blue-light);
+    }
+
+    .q-counter-dot.current {
+      background: var(--blue);
+      width: 18px;
+      border-radius: 4px;
+    }
+
+    /* SCROLLBAR */
+    .dropdown::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .dropdown::-webkit-scrollbar-track {
+      background: var(--cream);
+    }
+
+    .dropdown::-webkit-scrollbar-thumb {
+      background: var(--cream-dark);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+      <div class="logo-wrap">
+        <!-- Almacafé logo inline SVG approximation based on brand colors -->
+        <img
+          src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCADhAvwDASIAAhEBAxEB/8QAHAABAAEFAQEAAAAAAAAAAAAAAAcCBAUGCAED/8QAWRAAAQMCAgQHCgoGBwYEBwEAAQACAwQFBhEHEiExCBNBUVJhoRQ2N3F0gZGxstEXIjIzNEJyc5PBFSM1VFbCFkNiY3WSsyQmU4Ki8ESD0uEnRlVkZZTx8v/EABwBAQACAwEBAQAAAAAAAAAAAAAGBwMEBQIBCP/EAD4RAAIBAwEGAgYIBQQCAwAAAAABAgMEEQUGEiExUXETQSIyNGGBsRQWMzVSU5HBFUJyofAjJNHhJTZDYvH/2gAMAwEAAhEDEQA/AOvURFpGwEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREATlXzqZ4KWB09TNHDEza6R7gGt8ZK0u4aTrAyodS2WCtv9UDkY6CEvaD1v+T2rYo2tWt9nHJgrXNKl68sG8ICtAF50m3Mf7Dhe3WqE7WyVtRrPy62tJyQWfSpO7ObFlngB+rDRa2Xpath2G7600vjn5Gv9Oz6kG/hj5m/oFoLrBpMYM48bUDjzPoRl6l5lpZt41i+wXkD6o1oXHz5AJ9CUn6NSPy+Y+myj61N/P5G/oo/+EC52xwZirB1zoB9aemaJ4W+MtzK2nDuJrDiGLXs90p6vIbWNdk9vjado9CxVbGtTW81ldeaMtO8pVHu5w+j4My6Ii1DaCIiAK7p/mWq0V3T/MtWWl6x4nyLRERYj2EREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBF4diE6rS5zgABmSeRfUs8j43hZB3b8suzrWk4kx22O5OsOFKE3u9bnCM5Qwdb3fksbdbzdsd3Saw4VqH0VmgdxdfdW73nljiPP1hbFYG4Owi2KwUVdb6KpfkTHJMOOlceV2e0uPWurTtoUEpVY70/w9O//AAc2dxOu8U3iPXr2MLSYArLzUNuGPLvLc5c82UMLjHTRf2ct7vPktqsZstLUVFntVNBSvoQ0SRMjDdUOGYy59+9ZYZ5bcvetXxBar2zE9NesO9ycdJA6mqxUk6mqDmxxAIJIJO7kyWH6RO4bjUlheSXBIyfR40EnBbz888WX14ulVRYps1DkzuSv4yN5Lc3CRrS8bebJp2Ky0pVdZQ4Jrqmhnmp526oa+IgOALgDlnuKvrtYY75bqKnu00nH0rxLxtM90Z19Ug5HPMbCeVfWS1WeOyGz1I42iIycyondIXbc9rnEk+lfabpxlBpZa58OfvFWM5RlGTxnlxLPAzJGUE/HfpEHjcwK2oZK8DLkLQAB1LAWrEl5mrRh+CVk9zZc5o5pJWawipoyM3kAjacw0ePPkW2WanslvY+O2Opow92bwx+eZ9Kqt9ktdBdq260lK1lXXEGeXMnWy8e7zL66lNSlKcW88so8qE5KKhJLHPDLbGOJ7RhmhZPdS97ZX6rYY2a7nDny5hylY3Eej/Dt6k7sZTvttw+Uyrozxbwd+3LYfFksVjfA9yuv6QulNdp5q+ZnFRQEMEYh2fE2jNuZzOYIO1ZLSbe6632d9rshyu9VA98bsvmYmtJdIebdkOvJZqcdzcVvP0nz6GKct7fdePorkYc3nF2ByI8TROv1lGwXKnZlNEOeRnL4wVvlnudvvFvir7ZVR1NLIM2vYc//AOLB4NxCL811IyDuiCmpmNqaon4r5SPjR5HeRy+MLA37C9ywtXyYkwK06rjr11pJ/VTDlcwfVd4l9q0oVpunNKM/7P8A4PNKpOjBVINyh7+a/wCSRhuRYXB+I7diizsuVukIGerLC75cT+VpHOs1yDnyXJqUp05bslho6lOpGcVKLymFd0/zLVaK7p/mWr1S9Zn2pyLRERYj2EREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQHijzG1wrsUYgOBbDO6GJjQ+8VjDtijP9UCPrHdz71sOkbEX9GsNS1kDONrp3CCihA2vlccgAOXkXxwJhybDeFnxMcye81LXT1M0p+cnIzGseiCunaRVCn48ub4R79fgc65m60/Bjy5vt0+JnbJaaKzWmG222nFPTQM1WaoyHjPWo7miFHaL3h24Yeqqu6VlRO+CaOLWZPruJjdr/AFdUEb8ssljamXuOnklqqm50eN4pQ6Nr5S5lUXO2BjfkuZkOYEZb1LdXVw0FBJWVszaeCFhfK8nY0ZZrLNTt5Zzvb3w4/ujDHcuY4Xo7v+fqfG0xy0Vlpoq6YGSGACWRztmwbSSsLJiaquUr6fC1v/SGqcn1k7uLpmHqdvd/ygjrVtT0lZi9wrLqyWksodrU1DmWvqeZ8pG3V5mjz5rbYYooIWQQMZHEwZNa1oAaOYALUl4dKTlLjL+yNuO/VilHhH+5rYw5cq4B98xFWzZ74aM8RGOrYfjedfaDBWFI3a5sdJLJ/wASVus/0rYcsupeHMblidzUfFPHYyxt6cfLPcwkmEMKys1H4etzm8xiVs7BdshOtaqqvtLhuFLOWs87eXxLZAveUL5G5qripB0KUlhrBq7pcWWYa9RHFiCjbtLogIqhg+xnqu9OayFBX2fEdDOKWUPc6J0MrHN1ZYg4ZEFp2hZgEZ55+NYO/wCHo62dtxt8xt12j2x1MY2SdUjfrNPp5iFmhVjUfpLdfVfuYp05QXo8V0f7GIub6fAGEqS2WSlBdJLxEMsx/Vse7Ml8jub/ANgvjhGWqt2LDZTe33lk1L3VUuc7WEExJ3EfJachk1ZmyXOO9RVFlvdDHFcIWgVVLINZkjTuezPe05eZfG6dwYQtWtZbTCaqsnZBFE1xHGSOOQ1nHM5DYtrxHxpyXpPz6/E13T4qon6K8jX8a2qqwreTjrDsTnRnZeKKMfPx8sgA+sN/pW9We40l3tlPcqCUS01QwPY4HsWFtl1vLby2yYkpKLWqoHSRS02eoQCA5jmnPbt35+Za7hbWwTj2bCkjiLRdSam1k7opPrxeogda+1KTr0t2XGceXvX/AEeadRUam9H1ZcMdGSQrun+ZarMZ8qvKf5lq5lL1jpz9UtERFiPYREQBERAEREARebgvQgYXzqJ4aaIzVE0cMY3ve4NA85WqaT8bUuDLKJ9Vs9fPm2mhJyzPSdzNC5mxJiW94jrTVXW4TTOJzawHVYzqAz3KT6JsxX1KPiN7sOvXscDVdfpWMvDS3pHWsWIbBLII4r5bXvO5raphPozWSBBAIIIIzBC4hGYdmHEHqJW56P8ASJfcKVTGcfLW20n9bSyuzAHLqnkK7V7sLUhTcreplryfA5drtbGc8VoYXuOrEVhh+7UV8s9NdaCXjaeoYHNdyg8oPWFfqA1ISpycJLDRMYTjOKlHkwiIvB6CIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAg27tpVlerlR2e1VFzrpBFT07C97j6h1ncotqNPWH2Qve21XE6rSWuLW5Z8nKujZaVd3q3qEG0jRutQt7VqNSWGzNuAxVpfyf8AHt2HIgW5/JfUvGef/KCPQq8ZYxfSXs0eH7kau4UoLZ7W2ifKH7d5expLT5wFHOjjS7ZbHZ6yWrtdwmrLhWSVcxY0HMuJ1QNvNkMlJtHV4Nx5FTvMb6W6OZxjGuYYKqF3LkSMiR512b2xq2VVKvTe5FYX75OVb3MbmDVOaU2+P/BsGHKqS+W+muV1sTrfWROOoyoDXPjOQ+M07xn6dixkrDirET4XgmyWuXJ4G6qqByHna07x0gsjiquksuGHmnc+eqLW09NrnN0kjtgzPPsJV5h+2Ms9lprfE7XMTBryHfI/6zj1k5lcV1N2LqLrw9x1VCUmoN9/eX43bsubq6l6PQOdYjFt/o8NWc3SviqpYA8McKePXc3Ply5ti1CDTLgua8U9BHNUls5yFQYviNcdw2bexY6VjcV4upTi2vM9Vr23oS8OcsNmb0oYnp8MYSrauSUiqkYYqaNj8nl7hyZbdm/zLBYExbeaaW0WTGLoHV1ypTNBIzY8Ackg3btoPjWy4wwdZsT9zz1sOpWUr2yU9QPlMcCCMxuI6lGePbLcMI1dRi6srqy+3ioYaaikbShkNLnkMyNY5dXnXVsYWlaj4P8AM88+efJLoupzb6d1SrOquMV+nxJpo6qmradtRSVEVRC75L43BzT5wrK/Wya4RRPpLjU0FTCdaOSN2bD1OZucPGNiiHAlBesK2d1WJ20slG8VNyeanjmzwEaziIwN4BIzz3hSNhDHVmxI2J1OyponTAmnFU1rTM0by0gnPeNm9at1p07ablSe9FeZsW1/TuIqFVYky4or9V0lVHb8SU3cs8h1YquIE08x5Bn9Q9Ryz5FsXUfOjmhwDXsDsjmA4Z5eJNueQ8651WUZ4ljB0acZRWG8mDxbaZqyKK525wiu9CS+mflscPrRnnDhyc4C+epQYywxC5xlpi54eHMOUlNOx2Wzra4EdeS2HlWr0TRZscz0TdlHeIzURN5BOwZPA5vigHxkrPSnKcMeceKMFWnGM/dLgy4suG5KO6uu1yu9Td65sZhiklY2NsLCQSA1uzM5bTvWO0t2aa6YTfV0WYuNreKukc0fG1m72jxhZfE+JaHD7YDVxVNRLOHcVFTx6z35DM7yBuBVlhTFLcRVc9HNa56EOpmywidwJljcXNOwZgEavPyrLS8fKuccF8uhiqeBuugnxZk8KXeK/wCG6C8QkatVC17gD8l2W0eY7Fn6f5lqjXRA42+bEOF3nJtsuDzTt5oXnWb68lJVP8y1ebikqVxKK5eXxMtvUdShFstERFzzcCIiAIiIAiIgC+NXUQUlNLU1EgjhhYXvcTuAGZX1O5Q7wjcXCjoWYWoZP19SNeqLTtbHyN6szt8y6Ol6fO/uY0I+b49jR1G8jZ0JVXz8u5E2kjE82K8V1FzeT3Ow8VTMP1Ywdnp2nzrXN5PjQAZZcnIive2toW1KNKmuCKlr1p1pupJ8WOVMsvN2Jkiz4MRLXB2xf+jbq/DNdLlS1ji6nc47GS83nGfnyXQu3Pm5vGuI4ZZYJ454Xlksbg9jhyEHMLrHRZiqPFmE4K0uHdkIEVU3lDxynxjIqr9tdIVKp9MprhLn3J5sxqTnH6NN8VyNrRPEigHImIREQBERAERePc1jC97g1rRmXHcAvqWeR8bwsnqKNMUaZsMWmqfS0Uc90laci+DLiwfGcs/GFg/h7of4fqOv9YPeu5R2b1KrBTjSeGcqprljTk4yqcUTOihj4e6H+H6n8Qe9Ph7of4fqfxB71k+q2qflMx/WCw/GTOiiqx6cMN1lS2C40dXbg4/OuAcwePIk9ik+kqaespY6mlmZNDK3WY9jgQ4dRXNvdMurF4rwcTftb63u1mjLJ9kWNxRdo7FYKy7yxOlZSx65Y3YXbQPzUUjT3QkAnD9SMxu4we9ZLLR7y+i5UIZSMV1qdtaS3assMmhFDHw90P8AD9T+I33rPYC0r0mK8Rx2aO0z0rpI3PD3PBAyy5j1rZr7OajQpupOnhLizDS1uyqzUITy2SSiIuJ54OsEWh6StI9Pgq4UlJNbZas1ERkzY4DLaR+S1T4e6H+H6j8Qe9dm22fv7qkqtKnmLOVX1mzt6jp1J4aJnRRtg3TDh+/XFtvqoJrZM/5D5iDG85Z5ZgnI+NY696cbLRXGWkorXVVbInFpl1mhriDls2pHZ7UZVHSVJ5QetWSgp+IsMlpFDHw90P8AD9R+IPenw90P8P1OX3g96z/VbVPymYvrBYfjJnRRLZdOVkq7hFTV9rqqOOVwaJsw5rc+U7c8lksZ6XrBh+4G300MtzqGfOmIgMYebMnesEtn9QjVVJ0nlmVa1Yun4niLBJCKGPh7of4fqfxB70+Huh/h+p/EHvWf6rap+UzF9YLD8wmdFFuFtNNku93ht1Xb6igM7gyOV7mlmseQ7cwpSPNzLl3un3FjJQrxw2b9re0LuO9SllBFjcQ3u14ftz6+7VkdNA3YC75TjzAbyVGNfp4s0c5bRWatnjBy13lrc/FtWaz0i8vVmhTbXUx3WpW1q8VZ4ZMCKGPh7of4fqfxB70+Huh/h+p/EHvW99VtU/KZqfWCw/GTOihgae6HWGeH6nLlykGfrW4YK0nYaxTO2kp5ZKKsduhqQAXeIjYfFmte52f1G2hv1KTwZqGs2VaW7GaybuiOBBTlOzYuPhnTysBFpuNdJGGcLSupquofVVjd9PTgOcOoncPStLfp7t4cdTD9Vq8mcjc/Wuva6BqFzDfp03g5tfWLOhLcnNZJmRQx8PdD/D9T+IPenw90P8P1P4jfetn6rap+UzB9YLD8ZM6LUtGmNoMbW2rrIKKSkFNNxTmvOeZ1QfzW2nZnnyf95ri3NvUtqjpVFho6lC4hXpqpB8GEUf4x0tYYw9VPo2OluVUzY5lNkQ09bjs9C1j4e6H+H6n8Qe9dShs7qNeCnCk8M0Kut2VKW7KfEmdFDHw90P8AD9T+IPenw90P8P1P4jfes31W1T8pmL6wWH5hM6KJLVp1sNRUCOvtdbRxu/rRk5rfGM8/QFJ9pudDdqCOvttTHU08g+K9hzHiPMeorn3mlXdlxrwaRu2uo2128UZZZeIvhX1DaShnq3AuEMbpC0byAM1D509UIJH6AqDkSM+Mb70sdKur5N28d7B8u9Rt7NpVpYyTOihj4e6H+H6j8RvvT4e6H+H6n8Qe9dD6rap+UzT+sFh+MmdFDHw90P8AD9T+IPeruy6baK5XmitwsdRGaqdkOsXt+KXOyz39a8z2Y1OEXKVJ4R6jr1jKSip8yXF4dm3mXxr6ltHb6ireC4QROlIG8hoJy7FD4090O8YfqcvvG+9aVjpV3fZdvDODau9St7NpVZYyfLhAy4rvFfHYLVZLlNbYQ2SWSKEubM8jMbt4HrUL4iw3iWis89RU2G5Qx5AcY+AgZk5Kbfh7oR/8v1OY3frB71rGkvTFSX3DDrfFZpoiZ4nlznjLIOzPKrD0d6vYwjQhbYj5vz7kNvVY3VZ1vGy/JY/sZrRLonq6aywXm5SR01zLGupYpI9dsP8Aac3lJ7FIcdhxFXXu21V7ns7o7fMZmy0dO5ssp1HNAJLjkPjZnLmUW4p031E1kbFZaaa2VERaeMfqua5o5Dt2K40f6YKmqu9JDcDcKsVb2wNjljYxsbnEDW2HPJcnUdN1m537qrHrw6I6FpeabS3acPi+rJWxCO7MY2C3H4zIzLWyD+0zVDPW5bITlt3Ba8Gh+keXP+qtrNX/AJnvz9Syd/tsV4tFRbpp54GTty4yF+o9p5wVDKuPQhJ4SJLTy9+aWWaDp+xk3D+GzaKN7TcLiCwDfxcf1nePcPOVHvB3wY26XZ2JrhHnRUDsoMxsfIOXry2Ky0o6O8U225i53Ctqr1biWsfW7XyxRg/Wbv2DPdsUs1WKcGYNwTaKMTydwVlPqU7o4zmQRtec+ckqXqcLTToW9o96VTm1/ci7jK5vZV7lbqhyT/saziDTpHFfXW+w2Xu+NsnFNkLjnK7PIaoC3rBeM7fip1RaKyglt10ib/tFvq2fG1T1HePUoWwLQ0GAMY1N2xPSzy0kMDpLbURwOfFMT8lwIGQJBOWeW/arfR/eLniXTjSXpmbHT1DpJWt3MgAyyPVuS40e2nSk6EcKEc73V9D5Q1W4jVSrSy5PG77upMmIMBUzGOqcPxiN7phJVUnGnVqoxvizPyW5DYBsz5FF1PBNgiku1Td6F0OUjm2KimkLpmPkBBc0DcMidvPkpYvelPBFouBoqu8NfKw5P4qNz2s84GRWQkiwnj20RzRyU1xgjcHRTRnJ8L94I5Wlcm3u7m2ju3EHuP8Az/PcdK4tLa5k3Qmt9GmYFxFe8O1eH8O4nrBWz3WAyNadstKfqgnlBHPtzz2qSbNd7beaczW2siqWNeWPDXDNjhvDhyEKLMd4Sq8MRVeJrWy6X68ysMUdTK8O7jaRlrBueZPNkFaaMcMVNOYaS33Wgjr4JI6qaop5teSeMkF7X6uwAE6oB8a+3Npa3FJ3EZYf/wC54foj5bXVzQqqhKOSbdxWtY+aYKS3XWMfHoa+JxP925wD+xbI0bhvHKSte0lD/cG9uGwso5JB4wMwuFa8Ksc8snbuuNKTL6+0NDUuoq6tqO5xQSmZr8wG/GY5hDs/q5O9SsLNUYRpqulobZXUHdTWuZAxs2s/Vc4uIG3M7SVd4mtAv+G3WyR7WtlMLzrDMHVe1xBHXll51d0NrttFl3LQ09O4bjHGBksniRVPdlJ+fAxqnJ1N5RXc02jb3BpzrmA5MuVqY8DPe5hAz9AUlU/zLVGt9OWnPDeWzWtVRmPEXKSqf5lq2LlZ8OXm4/vgw2vDxI9JfsWiIi5R0giIgCIiAIUQb+RBkxeKr1S4ew/V3iscBHTsJDSctZ3I0eM7FyDfbpVXu81N1rpC+aqkL3Z9g6gpI4Q2Lv0pe24dopc6OhdnOWnY+Xm827xhRV+at7ZDSPolv49RenP5FbbSal9JreFF+jH5hEzGS9UyI2eIiHYgC3bQ5i04UxZGZ5CLfWEQ1Iz2Dou8YzK0nNeZDLIrVvrWnd0JUai4Mz21xO2qxqw5o7fY5pa1zSC0jMEbiF6ox0A4vN8w6bPWy61dbgGt1jtkj3A+bYFJ3UqG1CynY3E6E+aLbsrqF1RjVj5hERaRthERAOVQ9wkcVVNuoKXDlDKYpKxhkqHNOTuL3AeIkFTDtzXN/CXJOP6cZ7rezL/O9SbZK2hcalFVFlJN/ocHaKvOjZNxeG2kRhkBsA2J509SbFdK4FYBE5M+RF9GAfUpf4OGKamnvT8LVMrn0tQwyUzXHPi3tGZA6sgdiiBbhoWJGk2z5E/Lfu+yVxdetqdxYVFNck2u6OlpNedG7puD5tI6G0seDi+bN9N/MFyQ3LVG3kXXGlnwc3zyf+YLkcDYPEo3sGsW1RLqdra32iHY9GeW9SBwfPCZS9cEhP8A0qP8utSBwfPCZS+TyfkpRrfDT639LOFpfC8p90dP5IiKhl08i3seTOfuFB3y2rLL6KfaKiHape4UHfLavJD7RUQ5q79l8/wuj2Ko1zhf1MdT1pLSHAkEbiORech696INvWu+sHJHpTaiIwzw7cweVVPJc4uc4lx5SvOXciYHEZpmiL6D7UH7Qpfv2e0F2u3IgZ7slxRQ/tCl+/Z7QXak+ykeRsIYdqrfbyOatBdc/sTXZJ7sK0u37nKelrFNRijF1U50rjQ00hjpYwdgA3u8ZWoqqbbUS57+Md5tpVKndhbwt7eFOCwkkRK7qzrVpTm8tsbU2onLlyrdNfgNq9jfJFKyaKR0crCCx7TkWnnC8zzTZy7l5lGMliSyfU3F5R1boexNLijBUFVUu1quncaeoPSc0DI+ghfHTPix+FcJOko3htfVu4mmJ+rmPjO8YGeS1fgvZ/0cuozP0r+ULEcKV7jX2SMk6nFPdq9esVUdLTKUtf8Ao38uW8f3LDqX9WOjKt/NjH7EMzSSTzOmmkdJI85ve45knnVJ8aIrcjFRWEV223xyMiRnmnj2hNyci+gn7gud7t5z/fW+wFmdPuKajD+FWUVDIYqy4PMYe3Y5jAPjOHYPOsLwXMjh28jP/wAY32AsZwqCTXYe+5n9piqr6PC42ldOays5/RZJ6q06Ghb0Hx5fqyFd52nadpPOedPOh508ytRYRA+LGaZp6E3ci+nwcuakbQJimosuL4bTJK40FydxToydjZPquHbmo5WWwYcsXWktOWVWxc7VrancWlSFRZWGblhWlRuYSg8cUddYizGH7lz9yyeyVxg/5x/2j612fiP9gXLyWT2SuMH/ADj/ALR9ahuwSxGsl7iS7XPMqZ5u5UzRCQN+QVhkOwFl8EH/AH0sY5P0hD7YWH1mjeQFl8EuBxrYxmPp8Pthal5KLt58fJ/Iz20X40eHmjrnEne5ciP3OX2CuL2/JG1doYl73Ln5HL7BXF7fkhQfYP1a3wJVtbxlT7HqsryM6Bxy+SQe1Xq+dTTyVdPJTxRukke0hrWjMnl2ehWLFqLyyJUniaKHwxVMDGyMDhkD51lsD00MWMLQ6NmqTWRDeT9cK1slqvFZa4aintNfKzV1dZkDiCRsPJ1K/s7Ku04rsxraWWnf3fCdSWMtdlrjM5FaN1XpzpThGSbw/P3GzRhUjVS44z+51RWEwaSqNztgrKCVg8cZB/nWxgg7Qtax8e5I7diBgOrbqoSSkf8AAfsf6mrZAQQCCCDuy5VQ9ZNxjJc+Ra1F4lKLPCxpYWOAc0jJwIzB8a0fSrgRuKbfRyULKZtbbnl8EMrcoZW9B2W4dY3LefSvTuz2dXIvFtc1LeoqlN8Ue7m2p3EHCos5OetIz9JmKIafDrsJTUVJCQCyEBzZCNx1uRqxt+tFTowwiyB0wGIr20skfGdlNC3LNoPOcxt6l0uDlnmVEnCLwjX3ygoLvboX1PcLnNqYYwXOMZyzIHVkVKtM1tVqlO2qRUaecvHm/fkjWoaO6VKdeEnKXl7kRTowprPbqxuI8V2etnswfxUc4jzhEhO923MqRMLsvDdOAqLDaG0uH6gODpacHiZ4dUlsh25Zk5bgtL0n44tdyw5a8JYaikittKxpn149RzngfJI35g7+vNb7g6812GNFEFlNXTDEs8bn0NHPM1kjWPy1RkTmCBnkOddXUXVqU/GksOeYqLfJeTx1OZY+FTqeGnlRxLPnnoSA3G2GjiqbDBuUba9jRsfkGucfqg8+WWzrWWt1otlvqqmqoKCCnmqSDO+NuReRu/7C5ZueHBlBSXBtda8USvMjzXHVjqiTmNV/1T1k71MGhpukunqTQ4mhDrVCzJstQ4OmBy2BpG13jOfUuDf6PTt6HiUavdPhn3rqjt2Oqzr19ytT7Nccd+hKZWu6SDng6tps/jVerSt6zIdUBbGd61nE5/SGKLJZRtZFJ3fUDotYc4yeouBUftFiqpdOJ27p/wCk49eH6mXvFyprLaX11YJTBCG8YWM1i1uwFxHMN6+tsr6G50jKy31UVTBIAWvjdmD7lYYvtlxvFofb6CvZQiX4s8hj1iWEEEDPd41icF4Ibh26PuAvNTUPkiETqdsTIoTsyDi1gGbuvesqp0HQc5vEvIxupWjVUYrMfNlhch3Tp1tQaQTR2mUv6tZxA9akmn+ZaozwaP0lpXxVdmnOGkjioGHmcAC4etSZT/MtWe74ThB/yxS/f9zFZ8YSn+Jt/sWiIi5R0giIgC8K9RAOrdnsWo6V8VswphOarY4d2zgxUrP7R5fMtte9kbHSSODGsBc5x3ADeVynpexY/FeLJJInnuCkzhpm8hGe13jJ9QUj2a0l6jdpzXoR4s4evairO3aj60uCNPkkfNI+aVxfJI4ue4na5x2klU9aJuV1RSisLkVc25PLPrRU1RW1cVHSQyTTzO1Y42jMuPN4ltGPMET4Pt1sfca1j6+saXvpmN2Rt+1ynk3KTeDpg6OCgdiuthDqicllGHD5LBvcOsnP0LW+E3I92MrfE4/FjpCG+cjNRVa5O51aNpQfoRzn3nfelRo6e7mp6zxhdC/0K6N7NfcOSXq/QSTcfIY4Iw7IBoHyuvPPsVlpO0RVFjpZLth181VRRjWlp3bZIxzg8oUuaII2xaM7E1gyzpsz4y4raXgFpaQC0jIg7slC6+015bajUmpNxUmsPlhcCUUNBta9lGLjiTWc+fE4iBz2jl39aKQNOOEG4ZxP3XRxltvr85I2gbI3/WaOrmUfq1LC8he28a1Pkyv7q2nbVXSnzRmMF3+owxiSkvFMSeKdlKzkkYflN9GfnXXtpr6a52ynuFJIJIKhgexw5c1xVydRU18G/F2pJLhKukJa7OWiLjuP1meojxFRLbLR/pFBXVJelHn2/wCiR7M6l4FXwJvhL5k6Ig3Daiqp9UWGERF8A5VzfwlfCBT/AOHs9t66Q5VzfwlfCBT/AOHs9t6l2xX3muzI3tT7C+6IwTcEQ8quErbmTHon0V2jEeFGXu81FUXVJcIWQyamoGkt2nl2hRrjewuw1imtsrpeNbA/9W/lLTuPjXR2gof/AAstGWz53/VcoQ07+E65fZZ6ioLoWp3Nxq9alUk3FZ4dMMlWqWFCjp1KpBYkzR1uGhjwmWf7b/ZK0/kzW4aF/CZZ/tv9kqVar7DV/pfyODp/tVPujofS14Ob55P/ADBcjt3DxLrjS14Ob55P/MFyO3cPEopsH7NU7kg2s9oh2PVIHB88JlL5PJ+Sj9SBwfPCZS+TyfkpPrv3dW/pZwtL9sp90dPoiKhS3jn7hQd8tq8kPtOUQqXuFB3y2ryQ+05RCrw2X+66XYqjXPb6ncKWdD2jO1YosMt5vM9QY3SGOCKF2ru5SfGomXTHB08HEPlD/aK1trb2vaWO/RluvK4oz7P2tK5u9yqsrBBWkjDTcJYsqbMyczxMa2SJ5G0tdtGfWtc5dikbhGZfCdN5HD7JUchdXR69S4saVWo8txTOfqNKNG6qQjyTZ4TkCepTvhnQtZ63CMFRcK2qFzqYeMa+N+TIydwy5VBD/kO8S7Qwx3vW3ydnqUe2w1C4s6dLwZOOXxwdjZyyo3UqniRTwjje40r6G5VNFI4OfBM+JzhudquIz7F8Fk8Xd9d48tm9srGcillpNzownLm0iP14qFRpdT7UH0+m+/Z7QXalR9Dk+wfUuK6D9oU337PaC7UqPocn2D6lX+3X21v8fmiXbK/ZVv8AOpxRP9Il+8d6yqFXP9Jl+8d6yqBvVhUPso9kRCp68i5tNFJcbpSW+NwY+pnZCHH6pc4DPtU2Ys0L2egwjPVW6sqv0jSxcY50j845CN4y5PHtURYI79LJ5fB/qNXWeMO9a6+TP9She1OpXNpeUIUpNJ8/fxJLoVjQuLatKostcv0ONGnWaDt2oqY/m27ORVcinEHlZIu1hsn/AIL3e7dfKx7IWG4Un7Usn3D/AGiszwXu926+Vj2QsNwpP2pZPuH+0VWlv/7TL4/Im9b7hXw+ZDKcuZ/7CJ71ZhByYNDWjvDmKsLyXO7tqnT90OYOKl1BkD4lu/wLYG5Ibj/+1/7K34NfeBJ5W/1lSgqb1vWb+lf1YU60kk+SZZOlaZaVLOE50020YDBeErPhGjnpLO2cR1EnGP42TXOtll6Mgop4U/07D33M/tMU6BQXwp/p2HvuZ/aYvOy9apW1mnOo8t54/BnvX6UKOmyhBYSx8yFTuTPZkh3Lw55K5ys/IlTQxo3tmLLXU3a8TzmnZMYI4oXapzAzJJ84Wq6UcKx4QxU+1wTmanfGJYXOHxg08h8+amTgzd4E/l8nstWg8JXv9p/Im+0VBdO1O6q67UoTnmPHh5cCVXdjRhpMKyXpdSMFlcG99lp8rZ61illcG99lp8rZ61ML72ap2fyI3bfaw7o67xH+wLl5LJ7JXGEnzj/tH1rs/Ef7AuXksnslcYSfOP8AtH1qDbCcq3dfuSvaznS7Hi23Q9FHNpKs0czGyMMj82uGYPxHFalyrb9DTms0m2VznBoEj9pOX9W5TPVm1ZVcfhfyIzY4+k089UdT/o+gBOVDTDl2RBI6GiY4PZR07XtOYIjGYPoX242E7eNi/wA4XofG85Nex2z6rgfOqIlOt5t4LagqL4LBY4jGWHLn5HN7BXF7PkhdoYk73Ln5HN7BXF7PkhWFsD6tX4EM2u4zp/E9Wz6KWtdpHsTXtDmuqsiDyjVctYWWwddY7Hiq23iaJ00dJNxjmNORcMiNnpU6v4SqW1SMObTx+hFLWUY1oSlyTR0Poz1bPiTEmD6gNHE1JrKXMbDDLtIHiJKzc9BhTBlvnuv6Pp6drMyX6mvLI47mjnJUN4t0tWn+ldoxVbLbVxzUecFU1x2ywO3jxjM7VuFoxFYNKuIaWGB92t0tuidUMEb2Fj8yG5kOadoz2FVVeaTe0/8AcVoyjBr0u6+JP7a/t3Hw6WHLOI595IViqmYlwpHVVVKyKOujcDFnraoJIyPXsHiKtME1csMM+Hq95Nda/wBWC7+ug/q3jn+Lln1r74WwvbMONkFA+qdxp+OZZ3PG8nY3PIbSTmAvMUWqpnfBeLQWsutEDxYPyahh+VE7qO3I8hUecqU5Spxfovl7mdlQqRjGb9ZczO7tx3biVjL7cqm2MiqY7ZLWUwce6DCRxkQ6QaflDnyOfUV7h680t6ojPAHRTRu1KinfsfC8b2uCyfi3rVcfCniazg2U1UhvRfxLS03KiudIKqgqGTxHeRsLfGDtB6irreMubqWHqMPUTrqy6Uck1vqw4GV1OQGzDlD2kapz58s+tZnYvtTcynTfAU3PGJriY+SyWZ9aK11rpHVAIPGcWNZQXpHsFBbdLT7viuWsgtFQ9k9PVQM1mBzTnqO6IXQit7hR0lwpHUtbSw1ML97JWBw7eVb+n6nO2m3NtprHvx7jRvtOhcQSjwaefj7zlrTLjSnxliCmZaoniipGcVTkt+PI4nf6svEuk8DRV0ODbPFc8+7GUcYl1vla2qMwetWVrwBg62XAV9FYKaOoacw86zsj1AkjsWzOIAJJDQNu08i3NV1SjdUKdvQi0o9efE1tM02tbVZ160k2+h86ypgo6SWqqpAyCFhfI88gCwGC4Jqo1eJKxhZPcnZwsd/V04+Q3zj4xHO4qzfIcZ3BsUWsMPUsmckm7u2Rv1R/djl5zlzLK4ku9po2/oqvc5j6yBwiYCY2ybMtRrxud4lzY03Tj4a4yfPsbzmpPxJequRjq3CVVXXyuu814rKGqeWtpHUkpAiY3cHA78+VX9RWVeH8KVtdfa+OrkpInvMzIuL1gB8XZmdq1jRlc8T1UkOdE+ow7OwmmqKmcOqIeYHIDXHJz9aaSJX4kxLa8CUj3GJ7xV3R7dzIWnY0+M57Opbng1PHVKphqPF+5LyNVVqaourTTzLhj3syOh23T0eDYq6sblW3WR9dPnvJkJcOwhb9T/MtVlExscTY42hjGNAaBuA5Mle0/wAy1aE6vi1pT6m/SpeFSUOhaIiLTNkIiIAvOrIleqzvNwpbVa6m5VsgZBTxl7z1Be4QlOSjFZbPM5xhFylyRHPCDxf+hrA2x0U2VbcBk8g5FkXL4s93iK5yGwZLLYwvtTiXEVXeKonWnedRvQZyNHUAsSrw2f0qOm2ig/WfF9yqNX1CV7cOfkuQCubVRPuF0pKBgJdUTNi2cxIBPoVtyLcdCtKKrSXZ2ObrNZI57s+pjvzyXRv63gWtSp+FN/2NK0peLXhDq0jqW1UUdttlLQQgCOnibEABkNgyUE8KGjczEFnrQ06slO6Nx6w7Z2Kf1GPCPtLq7AzK+NhMlBO15y36rvi/mqd2bu/D1SFST5v5lla3bb9hKMf5f2MzoQrG1mjG0apzdAwwu8YJP5rdeVQvwYbw19Bc7G9/xonioiB5Q7Y70ZD0qaFra9bO31GrB+bz+vE2NGrqvZ05e7H6cDRdOdlF40e1jms1p6Mioi2bdmx3/SSuWQc257MjuXal8hFRZK6ncMxJTSN9LCFxdNGIqiWH/hyFnoOSnOwdzKdvUpPlF5XxIntbQUK8Ki80U7l96CsqLfXQV1K8snp5BJG4HIghfAbUU7nFTi4y5MicZOMt5c0dhYCxHT4qwxS3eAgPe3VmZ0JB8oenb4iFnVzPoHxd/R/E4tlZJlQXFwYSTsjk3NPVnsB8S6YO/ZtVH7QaVLTbxwS9F8V2/wCi1dF1BXtspP1lwYREXCOuOVc38JXwgU/+Hs9t66Q5VzfwlfCBT/4ez23qXbFfea7Mje1PsL7ojBBsBReHcrhwVtz4HVGgrwWWj/zf9VyhDTv4Trl9lnqKmzQXNE3RbaWOmja4cbmC4A/OuUJadHtdpMuTmODhqs2jcdhVb7Nxa1uu2vxfMmmstPSqWH0NI5FuGhjwmWf7b/ZK0/kW4aF/CZZ/tv8AZKnGrew1f6X8iLaf7VTx+JHQ+lrwc3zyf+YLkdu4eJdcaWvBzfPJ/wCYLkdu4eJRTYP2ap3JDtZ7RDseqQOD54TKXyeT8lH6kDg+eEyl8nk/JSfXfu6t/SzhaX7ZT7o6fREVClvHP3Cg75bV5IfacohUvcKDvltXkh9pyiFXhsv910uxVGue31O4XTHB08HEXlD/AGiuZ10xwdPBxF5Q/wBormbb/d67o39lvbfgyLeEX4TZfJIfUVHJ3KRuEX4TpfJIfUVHLty7Wz/3bQ/pRy9W9tq/1M8d8g+JdoYX73bb5Oz1Li93yD4l2hhjvdtvkzPUovt56lHu/wBjv7JevV7HIeLu+u7+Wze2VjFk8W99d38tm9srGKa2HssOy+RFbn7aXdn2ofp9L9+z2gu1Kj6HJ9g+pcV0P0+l+/Z7QXalR9Dk+wfUoHt39tb/AB+aJbsr9lW/zqcUT/SJfvHesqg86rm+ky/eO9ZVCsGh9lHsiH1ftH3Mxgjv0snl8H+oF1ljHvXuvkz/AFLk3BJDcZWQuIAFfDmc/wC8C6uxfPD/AEXug4+LbTP+uOZV7tjGTv7d4/zJL9m5JWdfL/zBxvGf1bfEquRUxD9U3xKpWLB+iiHSwm8E/wDBe73br5WPZCw3Ck/adk+4f7RWZ4L3e7dfKx7IWG4Uv7Tsn3D/AGiq1t//AGmXx+RN633Cvh8yGUXi9VmIg/mdH8GrvAk8rf6ypQUX8GrvAk8rf6ypQVEa/wDeNXuWzovsNPsFBXCn+nYe+5n9pinVQVwp/p2HvuZ/aYt3ZH72pfH5M1tpPu+fw+ZCp3IdyHcvN/qV1eRV/kdHcGbvAn8vk9lq0HhK9/tP5E32it84NUkbMATh0jGu7vkIDnAHLJq0LhJPY/HkBY9rh3G0Zg5/WKrfSk/rHVb95M7+Uf4LTWePAjFZXBvfZafK2etYpZXBvfZafK2etT++9mqdn8iJW32sO6Ou8R/sC5eSyeyVxhJ84/7R9a7PxH+wLl5LJ7JXGEnzj/tH1qDbCcq3dfuSvaznS7HnOgzBBGwjcQiDMnIAkncAM1YMsNPJD1nPArM82/jZM/tFSnwZ5pXYzrWukeQaTMguz5VFnFy558TJl9gqUuDQx7ca1pMcjW9yZZuaQN6ju0MaK02rupZx7jsaNKo72nnOM+8nrEne5c/JJvYK4vZ8kLs/Ehzw5c/JJfYK4wZ8kKP7ArEavwOztev9Smeoiv7Ba6i9XqktNI6Ns9VJxcZecmg5E7T5lYNScYRcpPCRD4Rc5KMVxZj5Gh7CxwBBG3rW/cGCtgtmkSe3Vk7WcfRObTFxy1zrNOr48gdiyvwGYu/fLVv/AOM7/wBKzGFtCl1p6qpku1bSxu4j/ZJ6aUl8M4cC120DZsIPjUW1XXdMubKpRVZcVgkOm6dfUK8ZOk8Jky3u6U9rhj46Rkcs7jHT8ZmGOfyNc7cM+tapgjENxuuJ6yGKOokoQD3WJz9CqGnIxMd9dpPNmAsbh+sp73cXYYx1A6G+U8RhaC7KGtj6bf7XqW13CS3YQw9FSUkfccJzijlMRkZE8jY+TI5kZ8vL1Ks3QjQi6TWZPl07omirSrSVXOIry8yu+2B1RVi7Wip/R11Y3LjQM2TNH1ZG/WHXyL40eKmU87aHEtMbPWbhI8508vW2TcM+ZxB6laYCvF8xDUzXGs4iC2wNMEfE5ubVPzGcoJyybs2DrKyluvVjxBai97qd0DqiSnMVQW567XluWWee0jYsUqco5hVW8l5rmjNCcZ+nTeM+T8zNNcJGNe0hzXbWuG0Ec+aq7VrJwfTUzjJY7jcbQScyyCXWiJ62uz9AIVQosZwkCO+2qpYNwloHNcPGdfb6FreDCXCM/wBeBn8acfWi/hxNk5M+RAMzu29S1sw44eMjcbLCSfldyOf2awR2HbzWki7YorHtO+OhjFO0+nWOXnT6PFc5r4cQ60nyizIXq/2q0ZMrKoGc7WU8TTJK49TG5u7FhzQ3jFDgbwx9rs52iia/9dUD+9cNgH9kHbuKydBZ7Jh6lmqoaWKAMbryzyfGd4yST2KysGLobveRQm3VVEyaDj6SWoyHdDM8iQOTn8SzRW7BypLOPN/sYZy3pKNV4T8j7YoxDZ8KWxsdU59I10Tm0wjp3OYCMgBmBqg5kZAkcqssIVkeLsJOo8QUkU1TE4w1kMjWuGtvadmza0tOzZtW0VVPBV07oaqGOaJ4+Mx7Q4HzLWHUuFdH1DcbuM6OGoIdIzXLi5wGQawHbmV9pThOk4RT8TPBnmtGcZ70mvDXNHyrZrPozwZIynM0kbZXCjp3v13ySPPxY284z7E0ZYfqrbQ1F6vJ173dn8fVOP8AVj6sY6gPWsZhK0XLFV9ixpienNPFED+ibc87IWn67v7RCkTesl3V8GLpJ5lL1n+3/J5t4eLJVWvRXqr9wrun+ZarMK8p/mWrn0uZ0J8i0REWI9hERAOXeoH4R+L+PqI8JUMpLIiJKwtO931Wfn51K+kPEkGFsLVV1lyMoHFwM5XSHd7/ADLkevqqiurJq2qkMk87zJI48rip1sZo/j1ndTXox5dyI7T6l4VNW8HxfPsfHftROpFavDkQALfNAbg3SbbwT8tj2jx6uf5LQ1sWjS4i1Y/s1a85NZUhp/5gW/mufq1N1LGrFecX8jbsJqFzTk/Jo69PUrK+W+G72astk4/V1MLo3HmzGWfm3q9Pytm5Nu9UJCbpTTT4plvyiqkN18mco4Dr6jBOk2JtVnGIag0lS3P6hP8A/ldW57Nm381zTwibSLbj41sLdVtdCJs/7wHafZU7aN7n+mMC2ivJLnOp2seTyub8Un0gqZbUQV1a0L6P8yw/gRfZ+Tt7itaP+V5Rm60htHUOO4Ruz9BXFleQbjVkDfPIf+orsHG1cy24Qu1bIQBHSvAP9otIHaQuOAS7NzvlOOZ866mwNJ7tWflwRobXzTlTj7gNiFeb16VYuSG+Y2jIg5EHPNdR6FcXDE+FWRVUgdcaECKoz3v2bH+fJcucua2bRriiXCeK6a5Bx7leeKqmchYeXzb/ADKO7S6StQtHur0o8V/wdfRNRdjcqT9V8GdcovlSzQ1FNHUQPD4ZWh7HA7CCM19VSji08MtRSTSx5hc38JXwgU/+Hs9t66QXN/CV8IFP/h7PbepZsV95rsyObU+wvuiMEKITtVwlbcT7xVtbDGI4q2pjjG5jZXADxZFfOWSSaTjJZXyP5XPcST5yqDlynJD41jUIxeUuJ9c5NYbC3DQx4TLP9t/slafyLcNDHhMs/wBt/slaerew1f6X8jb0/wBqp90dD6WvBzfPJ/5guR2/JHiXXGlrwc3zyf8AmC5Hb8keJRTYP2ap3JBtZ7RDseqQOD54TKXyeT8lH633QHNFDpKpXzSMjZxEg1nuAHJzqT65l6dWx+FnC0t4vKeeqOok5Fbd30GWfd1L+M33r6xSxSs14ZWSMzy1mODh2KiJU5RWWi2o1Iz4RfEgLhQd8tq8k/mcohUvcKDvltXkh9oqIVduy/3XS7FW677fU7hdMcHTwcReUP8AaK5nXTHB08HEXlD/AGiuZtv93ruje2W9t+DIt4RfhOl8kh9RUcu3KRuEX4TpfJIfUVHLty7Wz/3bQ/pRytW9tq/1M8d8g+JdoYY73bb5Mz1Li93yD4l2hhjvdtvkzPUovt56lDu/2JBsl69Xsch4t767v5bN7ZWMWTxb313fy2b2ysYprYeyw7L5EVuftp92fah+n0v37PaC7UqPocn2D6lxXQ/T6X79ntBdqVH0OT7B9Sge3f21v8fmiW7K/ZVv86nFE/0ib7x3rKoVc/0mX7x3rKoKsGh9lHsiIVPtH3PWOcwtexxa5pzBByyPOrh1wuD2lrrhVuad7TM4g9qtk355HPxbV6lTjL1llnmMpRWEwNgXm4L0ocl7R54k/wDBe73br5V/KFhuFJ+07J9w/wBorM8F7vduvlf8oWG4Uuy6WT7h/tFVpbf+0P4/Im9b7hXw+ZDKe9ECsshB0fwau8CTyt/rKlBRTwcKqlgwJJHNUwRu7qecnyAHeedSb3fQfv1J+M33qjNfpT/iNV4fMtXRqsFZU+K5FyoK4U/07D33M/tMU5QzQzNLoZY5Wg5EscHAehQbwp/p2HvuZ/aYtnZJNavTT9/yZh2ialp02vd8yFTuQ7vMh3ICrqKwPtBV1cDSyCqqIWE5lscrmjsKommmndrzzSSuyyze4uOXnVBOQzOxOReFCClvJcT1vyaw+QWVwb32WnytnrWKWVwb32WnytnrWG+9mqdn8jJbfaw7o67xH+wLl5LJ7JXGEnzj/tH1rs/Ef7AuXksnslcYSfOP+0fWoNsJyrd1+5K9rOdLseLbdDsUc2kqzRyxtkYZH5tcMwf1buRaid63HQv4T7L94/8A03KZ6twsar/+r+RGbBJ3VPujqM2u2Z/s2j/Ab7l9aejpKdzn09LBC5wyJjjDSR5l9z8rzoqElWqSynJluxpQXFIx+JO9y5+SS+wVxez5IXaGJO9y5+STewVxez5IVjbAepV+H7kK2v8AXpnq2jRP4SbD5X/K5autm0VOazSNYnPcGtFUMyTkB8VynGpex1f6X8iLWXtFPuvmdcnPby7V5t2ZZL5mppsz/tMG/wD4gRtRA4gNqISTuAeNqoDwp/hZb6nDPNGFxnhW2YooWw1YfDVQnXpquI5SwO5w7f5lqtJii7YTkFl0gU/H0Lv1cF3YzOGQHYGyjcD41JOfPv3beZfKrp6eqp309VBHPDIMnskaCHBbVC8UY+HVW9H+67GrWtN6XiU+Ev7PufC3mhfamfol1OaQxkQcRlqZEbMstgC0bAOAH0dwN2xBS0vdMMsnc0EYDmjORzuMefrP27M9wAyX1qdH9ZZ6l9dgS9SWiRx1nUU2b6V58X1fMFSMbYjsZEWLsI1QaDl3Xbcpo3f2iNjgPMt2EZbklbTTUueeD/zsatSUN6LuYYceWOX+dzKYmjZVuuVbS4qqKOS2wkuhicwMheG6wLxlmc8txWbwxW1Fxw7QVtUzUnliD3gDIZ8/nyz861E33Rbia4sq6ue3SVzMs+62GKTZuB1gM8lulPdLTIxogudC9oGQDJ2EAeYrXuKc1TUJQefejPb1IyqOSmmu5h8fzX6islbdbPXU8DaOkkmdHJFrGRzQTsPIFViWOe44dpqiFlbMS1r3QUtSIDJmNub+QdaydyktVbb6ijq62mMFRE6KQd0NHxCMiAc9iw10vOCaSyfou53i2SUTYwx0Uk7ZMwCMgciSV8ob+7FKGXnyXkKu5l5lhY6+Zi9Hed3wdc8PXGVzn01RLSyZ1HHODXZPb8fbrZa+WfUvrTYZxJNV2cXK4W7irRJrR1MEbhNK3LV1Tty2jYdnLsVlDpBw/Tx9w4OsNfdSdjG0dKY4ietzssl6626Q8U5i7XCHDFudvpqR3GVDhzOfsA8y3XCpGbnJqEX15r4czUUqbhGKTnJdOT+PIzGMMdWyx1AttJHJdb1LsioKX4zyf7WXyR41jMPYQuN3useJcdSsqath1qS3sOcFIOTZuc7rWx4TwnYsMU5jtVGGSP8Anah51pZD1uO08qze/wBPiWlK5hRi4W65/wA3n/0bkbadWSnXfw8hkMhlllltC9O3l86cm3aUXNOglgK7p/mWq0V3T/MtWWlzPE+RaIiLEewiIvqTfIcPMgDhPXSWS/W20BxEVPAZnAbnOcch6Mj6VD+9S9wnLdLHiO3XXImGop+KLstgLOQ/5lEKu7ZZU/4XS3OnHv5lU67v/T6m/wBf7eQQoikHI5CB3L1j3xvZLE7KRjg5p5iNoWdwBhuoxXieltEGs2JztaokA+bjG8+PJTJpE0R2X+i0k2G6OSG4UrdcDXLuOaN4Of1uXzLh3+u2lnXja1Xxl+i7nTs9Kubii69NcF/fsb5o5v0WI8HUFyjd8YxBkzTva9oyIPoz862HdkeZcv6GMcuwjen0dwMjbZVvAmBBJgeNmvl2HxLpymmhqadlRTSskhkAcx7HBzXA82SqvaDSZ2F08L0ZcU/IsHRdRjd0MN+kuDRC/Clp2mmsdVsza6VhPPnq+5bHwcah0ujpsJOfEVD2DxE5/mtW4UlawyWW3A/HaJZXtG8A6oH5rK6IbtQYR0RG8XaUQxyzSSRsz+PKQSAGjlOxd6pSlU2do00sycuH6s40KsKetVJ5xFLj+hXwlMQto8OQWCGT9fXPD5QOSJu3tdqrnrxLZ6+pvGkTHWsGOdU1soYxo2thjH5AKZrxoaw6cKupbfDIy6xxZx1JlOT5MuUbsjyLvWV3a7O29O2r+vLi8eWepybm3uNZrVK9JejHln9jnJFXUQzU9RJT1EboponmORrhkWOGwgqjMcymcZKazHiiNtOLwwdqHdkURfXyPiOmeDzc5bjo8ZDO8ufRzugBJzOqACPaKkZR1webZLbtHcU0zHNfWVD6ga2/VIAHslSKqG1vw/4hW8PllluaRvfQqe/zwFzfwlfCBT/4ez23rpBc38JXwgU/+Hs9t67GxT/8muzOZtT7C+6IwQkAoh3K4OHMrbh5k96FdH+GrjgiG73agZW1NaXjN5OUbQ4tyGR6s1E+kqx02HcaXG1UZJp43B0Qdva0/V8y6E0FeCy0f+b/AKrlCGnfwn3L7LPUVANn7yvV1itTnJtcfmS7VrSjT0ylOMePDiaOtw0MeE2z/bf7JWnhbhoY8Jtn+2/2Sphq3sVX+l/Ijun+1U8dV8zofS14Ob55P/MFyO35I8S7Gx3bpbtg+7W6n+emp3Bg5yNuXYuO3xyRSOhlYWSRksexwyLSDtz61Edg5rwKsPPJItrIt1YSxwweL1jnMdrte5rhtzaciF4inrWURHPQr7oqMs+6Ztn94d/pXQ3BokkkwbW8ZJI/KrOWu4nLZ1rnbYuh+DJswbXeWH1KJbZQjHTW0kuKJFs1OUr6Kz1NW4UHfLavJP5iohUvcKDvltXkn8xUQrf2Y+7KXY0tcf8Av6ncLpjg6eDiLyh/tFczrpjg6eDiHyh/tFc3bf7vXdG/ss/978GRbwi/CbL5JD6io5O5SNwi/CbN5HB7JUc8q7Oz/wB20P6UczVvbqvdnj/kHxLtDDHe7bfJmepcXv8Aku8S7Qwx3vW3ydnqUY289Sh3f7Hf2S9er2OQ8W99d38tm9srGLJ4t767x5bN7ZWMyU1sfZafZfIi1z9tPuz7UP0+l+/Z7QXak/0OT7B9S4roT/t9L9+z2gu1Jvob/sH1KB7dca1v8fmiWbK/ZVv86nFE/wBIm+8d6yqFXPl3RL9471lUEKwKL/0o9kQ+q/TZe2Kibc73QW57ixtVUxwucNmQc4AntXQ2M9F+E48F1TaK3tpqqkgMkdQ1x1tYb89u3NQJgc/752Qf/kIP9Rq6yxj3r3TyZ/qUH2svK9C9t4U5NLnw7kq2ftaVW1rynHLX/Bxo05tBOW0Zr3YqY/m2+JVcinkHwTIm8Jk/8F7vduuX73/KFiuFJE/uyyThv6vUezPrzJWV4Lxyw7dT/wDdfyhbhpXwn/S/CclHCAK2ndx1M49McnnGzzqqat5C02idWfLOP1RP6drO50RQhz/7OUOVOXavrXUtTQ1ktHWQvhqYTqyMe3JzSvltVrQmprMXlEAlFxeGVMklYPiSyNz36ryAfQqhUT5/SJs/vHe9fNAvnhQb5I+78kuZ0BwX5JJMO3cSSSSZVgy1nE5fECxPCn+nYe+5n9piynBc73bz5a32AsVwp/p2HvuZ/aYq0tEltPhcsv5Mm1Zt6As+75kLFeZH07F6h3KzsEHRM+gLBFhvVjqr1eaRtY/jzDHG8nVYGgZnYeXNabpow5b8M4ydR2xpjpZoWzNjJz1CdhAPmUscGbwfz+Xyey1aDwlO/wBp/Im+0VANMva9TaCpBye7x4duRLby1ox0eFRR45XEjBZXBvfZafK2etYs71lMG99lp8rZ61Nr5/7ep2fyIxa/aw7o67xH+wLl5LJ7JXGEnzj/ALR9a7PxJ+wLl5LJ7JXGEnzr/tH1qDbCcq3dfuSvazhKl2KTvW46F/CfZfvH/wCm5aetw0LkfCfZfvH/AOm5TLVnmxrf0v5Ea0/2qn3XzOrzv86Id/nRUBniy4FyMfiTvcufkk3sFcXs+SF2vdKd1Xa6ukYRrzwSRt8ZaR+a4xulHUWy5VNvqonxzU8hjc1wyOw/9nzqyNgpxXixb48CEbXQk3TljgW69a5zXBzXFrhtBByI868RWO8PgyFZPua2r/farPfsmd71lcHVdYcW2jOtqSDWxZ5zO2/HGzLNYPlWVwaf97rR5bF7YWjeUabt5+iuT+RsW9Sfiww3zR2W/wCUfGqc1U75R8a8X5/bbfEuRJNBeHdyEHeCvUTIaMTdMNYfubS2vstDPnvLoWg+kbVgpdF2BnnWbZGwn+6nkb/MtzRZ4XdaHqyZgna0p84o0huizBWfx7ZNIOZ1VJ/6lk7dgPB9veJKXD1CHjlc0vP/AFZrZEXqV9cS5zZ8jZ0I8ooop4YqaPUp4ooW9GNgYB6AqiMztXqLWlJyeWZ4xUeR4V6iL4egiIgCu6f5lqtFd0/zLVlpeseJ8i0REWI9heL1E4A17H+F6XF2HZbVUkMkPx4JcvkPAOR9a5WxTh27YZuL6G7Uz4nNOTZMviSDnBXZXIRzq0udtoLnTmnuNHBVxH6szA4dqk2g7SVdL/02t6D8unY4Gr6HC/xNPEl/c4q9OSu7Vbq+7VrKK20slXO92qGxtz9PIF1BJorwE+YyusDNYnPZPIB7S2Oy2Kz2WLi7VbaakHPGwax8Z3nzqU3G3dFQ/wBGm8+84FDZKtv/AOpJY9xrGiLA0eDrM59VqPudUAZ3DbqjPYwHq9a3gbNua9RVzd3dW8rOtVeZMm1rbU7akqVNcEQxpg0VPr55b9hiJvHv+NUUgOXGHlc3r6lGeF8c4swXI6jp5nsjbmDS1bCWtOe8ArrPkWIvuGbBfGkXW1UtS473uZk8/wDMNvapNp+0+7RVvfQ8SC5dTg3uz+9Vde1luSOS8VYguWJbu+6Xadsk7gGANGTWNG4Acm8qqyW2/Ykmp7VboqmsDCRG3bxceZzJz3DeulItFeAopRI2wMJBz+NNIR6C5bVbLbb7XAILbRU9JHythjDc/HlvXZrbaW1KioW1LlyzyRzaOy9xUqOVepz59Wahoq0f0mDaEzTltRdZx+ulA2MHRb1dfKt5I5imQTLaoDd3la7qutVlmTJha2tO2pqnTWEiFNOWjaprKyTE1hg42R4zrKdg+McvrtHL1hQa8Fjyx7XMeNha8ZEeMLt7/sLX79gvC18eX3Oy0s0h2l7QWOJ6y3IlS/RdsZ2dJUbiO8lyfmRrU9mI3FR1aLw35eRx+css88lvOi/R9ccWXFk9RTvgtETgZZXgjjB0WjlzU8W/RngehqBPBYIC8f8AEe949DiQtsijjhibFDGyONgyaxrQGgdQC29T23VWk4WsWm/NmtZbKyjNSuJZS8kU0kMNNTR00DAyGJgYxoG4Abl9U5MuRFXspOTyyaKKS4eQ61pGOtGtkxfd47pcKmrimZCIQIn5DIEnm61u6cizWt3WtJ+JRlhmK4tqdzDcqLKIo+AvC/7/AHH8Qe5PgLwvy3C5f5x7lK6LpvaLUn/8rND+B2H5aMVhOx0mG8P01moXyvp6fW1TIc3ZucSc/OVqeL9FNgxNfprzWVVdFNM0BwjeNXYpBO3ei0qOo3NCq61OeJPzNqrY0KtJUpxykRQNBWF+WvuX4g9yyeFdEmH8PX6mvFJVV0s1OSWNe8ZEkZcykQJyg8y2qmvahUi4yqNp8zBDR7OnJShDigfGdvMtIxhowwtiatdXVMElJVv2vlpn6uuedwy2lbsBkvVoW13WtZ79GTi/cblxbUriO7VWURP8BWF/3+5fiD3J8BWF/wB/uX4g9ylhF0vrFqX5rND+B2P4CKPgLwuB9PuP4g9y3bAmErdg+1SW+2yTyxySmVxldmc1sKLXudXvbqHh1qjlHoZ7fTLW3nv044ZpuP8AR5Z8ZVlPV3GoqopII+LbxLwARnn+a1n4CsL/AL/cvxB7lLCL1Q1u+t6ap06jSR5raTaVpudSGWyJ/gKwv+/3L8Qe5b9grDdDhWxstFA+WSFry7Wldm4knNZpOQjnWO71a8u4blabaPdvpttbS36UcM0TG2jCx4svhvFfU1kVQY2xuETwG5NGQ5Fg/gLwvln3fcvxB7lK+3nRZaWuX9GCp06r3VyRjq6RZ1puc4cWRP8AAVhYjLu+5fiD3KUqCnjo6KGli1iyBgY3WOZIC+ycuawXep3V3jxp72ORmt7C3tm/CjjJGF00K4Zr7jU10lbcGPqZXSOAeMgXHM5bFb/AVhc/+PuP+ce5Sv18qLahtBqMIqMarwjWlotlJ7zgRXBoNwxFPHKK65ExvDwDIMthz5lKbgHRlhB1SCMhvXqLUu9Rurxp1p5xyNq3saFsmqUcZIqk0GYXfI5/d1xGsST+sG8nxKn4C8L/AL/cv849yldFuLaHUlwVV4NV6LZNtumiMrRoXw3bbrSXGKsuDpKWVsrGl4ILmnMA+hSLcaWO4UE9HLrCOeMseWnIgFXC8y2ZFaVzqNzdTjOtPLXJmzQsaFvFxpxwnzIoGgvCzQAK+5bP7we5e/AVhfkr7kf/ADB7lK6Ld+sOpJYVVmt/BLFv7NGtYBwdbsGUE9JbZaiVs8nGOMzgTnkB+S2Qr1Fy69edebqVHmT8zfo0IUYKFNYSNdxbgrDmKWg3e3tdM0ZNnj+LI3z8q0t+gvCpeS2uuQHIOMB/JSsn/e9btvrF7bx3KdRpdzVraXa1pb04Jsig6CsL/v8AcvxB7k+ArC+4V9y/EHuUros/1i1LP2rMP8Dsfy0a1gDBttwZQ1NJbJaiVlRKJXmZ2eRyAyHoVtpBwFasayUUlynqonUjXtj4lwGYcRnn6AtuT81oxv7iNf6Qpen1NyVlRdHwXH0ehFHwF4X/APqFy/zj3J8BeF93d9x/EHuUrot/6xal+azT/glj+WYDA2FbfhCyutVuknkhdMZi6U5uzOWzsWHx3o0smL7tHc6+orIpmRcVlE8AEZkg9q3ZerSp6hc067rxniT8zbnZUZUvBlHMV5EUHQVhfkr7l+IPcrm1aF8NW6501fHW17308ge1rnjLMc+xSd/3vTkyW1LX9RlHdlVZqw0Wyi1JQPjWwMqqOamkz4uaMxuyO3IjI5KL3aC8Ll7nd33LaSfnB7lKyLWtNSurTPgz3cmzc2Fvc48WOcEUfAXhf9/uX+ce5ZPC2iTD+Hr/AEt5pKyuknpi4sbI8FpzaRzdakRPOtipr2oVIOEqrwzXho1lTkpRgk0N+ezfuREXJ455nUC1LGuj3DeLJOPuNNJFVAAd0QO1XkDkPOFtqLNb3NW2nv0ZNPqYK9vTuI7tWOURR8BeF/3+4/iD3J8BWF/3+5fiD3KV0XT+sWpfms0f4JY/loij4CsL/v8Acv8AOPcrm16FsNW65U1fFWXB8lPK2RrTICMwcxn6FJybObrXmWv6lKO7Kq2nzC0Wyi1JQ4jPPaiIuQzq8giIvgCIiAIiIAiIgCIiAIiIArun+ZarRXdP8y1ZaXrHifItERFiPYREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBXdP8AMtVorun+ZastL1jxPkWiIixHsIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIAiIgCIiAIiIArun+ZarRXdP8y1ZaXrHifItEVfEydHtTiZOj2rxuy6HrKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKEVfEydHtTiZOj2puy6DKKFd0/zLVb8TJ0e1XMILYwCMislJNPieJtYKkRFnMYREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAf/2Q=="
+          alt="Almacafé" style="height:60px; width:auto;" />
+      </div>
+      <h1>Encuesta de Satisfacción</h1>
+      <p>Tu opinión es clave para seguir mejorando nuestros servicios. El proceso toma menos de 5 minutos.</p>
+    </div>
+
+    <!-- STEP 1: EMPRESA -->
+    <div id="step1" class="card">
+      <div class="step-bar">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+      </div>
+      <div class="section-label">Paso 1 de 2</div>
+      <h2>¿Cuál es tu empresa?</h2>
+
+      <div class="search-wrap">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2" stroke-linecap="round">
+          <circle cx="11" cy="11" r="8" />
+          <line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input type="text" id="searchInput" placeholder="Busca tu empresa..." autocomplete="off" />
+        <div class="dropdown" id="dropdown"></div>
+      </div>
+
+      <div id="errorEmpresa" class="error-msg">Por favor selecciona tu empresa para continuar.</div>
+
+      <div id="selectedInfo" style="display:none;">
+        <div id="selectedBadge" class="selected-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+            stroke-linecap="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span id="selectedName"></span>
+          <button onclick="clearEmpresa()" title="Cambiar">✕</button>
+        </div>
+        <p class="services-label">Líneas de servicio que usas:</p>
+        <div id="servicesTags" class="tags-wrap"></div>
+      </div>
+
+      <div id="alreadyWarning" style="display:none;" class="already-banner">
+        <div class="already-icon">✅</div>
+        <h3>Esta empresa ya respondió</h3>
+        <p>Ya registramos una respuesta para esta empresa. Si crees que es un error, contacta al administrador.</p>
+      </div>
+
+      <div class="btn-row">
+        <button id="btnContinuar" class="btn btn-primary" onclick="goStep2()">Continuar →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2+: ENCUESTAS -->
+    <div id="step2" style="display:none;"></div>
+
+    <!-- SUCCESS -->
+    <div id="successCard" style="display:none;" class="card success-card slide-in">
+      <div class="success-icon">☕</div>
+      <h2>¡Gracias por tu respuesta!</h2>
+      <p>Tu opinión nos ayuda a mejorar cada día para ofrecerte un servicio de mayor calidad.</p>
+    </div>
+
+  </div>
+
+  <script>
+    // ===== DATA =====
+    const EMPRESAS = [
+      { nombre: "SOLLA S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "BUGA, MEDELLIN" } },
+      { nombre: "CANARIAM S.A.S", codigo: 1, servicios: { ALMACENAMIENTO: "MEDELLIN" } },
+      { nombre: "GLOBAL COFFEE COMPANY SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA" } },
+      { nombre: "TMO IMPORT EXPORT SAS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA, MEDELLIN. OFC PRINCIPAL", CIR: "SOACHI" } },
+      { nombre: "SUNTERRA S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA- CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "CREAJEANS S.A.S.", codigo: 1, servicios: { ALMACENAMIENTO: "MEDELLIN" } },
+      { nombre: "COMERCIALIZADORA CUMBRES S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, MEDELLIN", CIR: "SOACHI" } },
+      { nombre: "MINA RICCA S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "AMARELLA CAFE S.A.S.", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CANASTO COFFEE COLOMBIA SAS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL", CIR: "SOACHI" } },
+      { nombre: "CAMPESINO COFFEE S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DE SALGAR", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRICIPAL" } },
+      { nombre: "GREEN HILLS COFFEE S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA- CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "AGROSURA S.A.S. ZOMAC", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA, MEDELLIN.", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "EPA BALVARA S.A.S.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA", "OPERACION LOGISTICA": "BOGOTA", TORREFACCION: "BOGOTA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DEL CAUCA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA", ALMACENAMIENTO: "POPAYAN" } },
+      { nombre: "CACAO DE COLOMBIA S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "COOP. DE CAFICULTORES DEL NORTE DEL CAUCA", codigo: 1, servicios: { ALMACENAMIENTO: "POPAYAN" } },
+      { nombre: "INDUSTRIAS TOMY S.A.S", codigo: 2, servicios: { ALMACENAMIENTO: "PEREIRA", "OPERACION LOGISTICA": "PEREIRA" } },
+      { nombre: "COMESTIBLES INTEGRALES S.A.S.", codigo: 2, servicios: { ALMACENAMIENTO: "CUCUTA, PEREIRA", "OPERACION LOGISTICA": "CUCUTA, PEREIRA" } },
+      { nombre: "ALMAGARIO S A - EN REORGANIZACION", codigo: 1, servicios: { ALMACENAMIENTO: "PEREIRA" } },
+      { nombre: "ANDINAAUTOS DEL CAFÉ SAS", codigo: 1, servicios: { ALMACENAMIENTO: "PEREIRA" } },
+      { nombre: "GERMAN GAVIRIA S.A.S. DISTRIMOTOS", codigo: 1, servicios: { "OPERACION LOGISTICA": "PEREIRA" } },
+      { nombre: "TRILLADORAS DE LAS COOPERATIVAS DE CAFICULTORES DE CALDAS LTDA", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA-CARTAGENA" } },
+      { nombre: "ALTAMIRA SUPREMO S.A.S", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", CIR: "SOACHI" } },
+      { nombre: "BARBELO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "AUTOGERMANA S A S", codigo: 1, servicios: { ALMACENAMIENTO: "PEREIRA" } },
+      { nombre: "REA SOLAR COLOMBIA S.A.S.", codigo: 1, servicios: { "OPERACION LOGISTICA": "PEREIRA" } },
+      { nombre: "INVERSIONES ECHEVERRI BARSA S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "AGROPECUARIA ORGÁNICA TATAMÁ SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "LOGIMPEX CARGO S.A.S", codigo: 1, servicios: { ALMACENAMIENTO: "PEREIRA" } },
+      { nombre: "FLOR DE APIA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "CASA SABOR CAFE S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "ALEXCAFE S.A.S", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "TOFFEE REPOSTERIA Y PANADERIA S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DEL CATATUMBO LTDA", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CRISTAR S.A.S", codigo: 1, servicios: { ALMACENAMIENTO: "BUGA" } },
+      { nombre: "TRADING GROUP INTERNATIONAL S.A.S.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "MANUELITA S.A.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA, PEREIRA", "OPERACION LOGISTICA": "BUGA, PEREIRA" } },
+      { nombre: "ELECTROLUX S. A.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "BELTRAN MORALES LOGIC S.A.S", codigo: 1, servicios: { ALMACENAMIENTO: "BUGA" } },
+      { nombre: "COLOMBINA S.A.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "CARLOS SARMIENTO L. & CIA. INGENIO", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "QBCO S.A.S.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "DISAN COLOMBIA S.A.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "IBAGUE" } },
+      { nombre: "RIOPAILA CASTILLA S.A.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA, PASTO", "OPERACION LOGISTICA": "BUGA, PEREIRA" } },
+      { nombre: "FENOCOL S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA" } },
+      { nombre: "MAYAGUEZ S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "BUGA" } },
+      { nombre: "TRILLADORA COMERCIALIZADORA Y PROCESADORA COLOMBIANA DE CAFÉ SA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", ALMACENAMIENTO: "BUGA" } },
+      { nombre: "C.I. COLORS OF NATURE S.A.S.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", "CALIDADES ALAO": "SOACHI", CIR: "SOACHI" } },
+      { nombre: "LA FAMILIA CAFE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "INDRA COLOMBIA S.A.S.", codigo: 2, servicios: { ALMACENAMIENTO: "BUGA", "OPERACION LOGISTICA": "BUGA" } },
+      { nombre: "LASSO & HIJOS S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "COOPERATIVA CAFETERA DE LA COSTA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "SANTAMARTA", ALMACENAMIENTO: "SANTAMARTA" } },
+      { nombre: "RIOSIERRA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA, SANTAMARTA" } },
+      { nombre: "ECOLSIERRA EXPORT S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA, SANTAMARTA" } },
+      { nombre: "EXPORTADORA DE CAFE ISABELITA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "SANTAMARTA" } },
+      { nombre: "COMERCIALIZADORA SEYNEKUN HMYS S.A.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "PROMOTORA DE CAFÉ DE COLOMBIA S.A.", codigo: 5, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", TRILLA: "MANIZALES, NEIVA", "OPERACION LOGISTICA": "BOGOTA", TORREFACCION: "BOGOTA", CAPSULAS: "SERVICIO" } },
+      { nombre: "SUCAFINA COLOMBIA S.A.S", codigo: 4, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA", ALMACENAMIENTO: "ARMENIA, IBAGUE, MANIZALES, PEREIRA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "OPERACION LOGISTICA": "PEREIRA" } },
+      { nombre: "PEPSICO ALIMENTOS COLOMBIA LTDA", codigo: 1, servicios: { ALMACENAMIENTO: "MEDELLIN" } },
+      { nombre: "NESTLÉ DE COLOMBIA S.A.", codigo: 2, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", TORREFACCION: "BOGOTA" } },
+      { nombre: "SUCDEN COLOMBIA SAS", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL, SANTAMARTA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "CONDOR SPECIALTY COFFEE SOCIEDAD POR ACCIONES SIMPLIFICADA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA", CAPSULAS: "SERVICIO" } },
+      { nombre: "LOUIS DREYFUS COMPANY COLOMBIA S.A.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL, SANTAMARTA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "SOACHI, OF PRINCIPAL" } },
+      { nombre: "INDUSTRIA COLOMBIANA DE CAFÉ S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "COFCO COLOMBIA S.A.S.", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "MASTERCOL TRADING SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "INDUSTRIAS ALIADAS S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CAFEXPORT SARL SUCURSAL COLOMBIA", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "CARAVELA COLOMBIA S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "DISTRIBUIDORA NISSAN S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "PASTO" } },
+      { nombre: "FUNDACION MANUEL MEJIA", codigo: 1, servicios: { "OPERACION LOGISTICA": "OF PRINCIPAL" } },
+      { nombre: "VIVE CAFE S.A.", codigo: 2, servicios: { CIR: "SOACHI", TORREFACCION: "BOGOTA" } },
+      { nombre: "CARCAFE LTDA", codigo: 3, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL", CAPSULAS: "SERVICIO" } },
+      { nombre: "LATINA COLOMBIA S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "PROMOCAFE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "TORRECAFE AGUILA ROJA & CIA S.A.", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "JAVIER PEREIRA SAS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA", TORREFACCION: "BOGOTA" } },
+      { nombre: "RAICES CAFE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "MILOST BRAND SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "HERRERA CAFE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL" } },
+      { nombre: "SALOMON PROYECTOS E INVERSIONES SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "OLAM AGRO COLOMBIA S.A.S", codigo: 4, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL", ALMACENAMIENTO: "ARMENIA IBAGUE", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "SKN CARIBECAFE SAS", codigo: 5, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA", ALMACENAMIENTO: "IBAGUE", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "SOACHI, OF PRINCIPAL", "OPERACION LOGISTICA": "IBAGUE" } },
+      { nombre: "RACAFE & CIA S.C.A.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, SANTAMARTA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "INTEGRA TRADING SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "CI ANDEAN FIELDS SAS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA, MEDELLIN, OF PRINCIPAL, SANTAMARTA", "OPERACION LOGISTICA": "ARMENIA, BOGOTA" } },
+      { nombre: "INDUSTRIA NACIONAL DE GASEOSAS S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "BUCARAMANGA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DE MANIZALES", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "XTS COLOMBIA SAS", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "C. I. LOHAS BEANS S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "INCONEXUS S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "BANCA EXPORTADORA S.A", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA", "CALIDADES - ENSAYOS": "SOACHI" } },
+      { nombre: "SOCIEDAD EXPORTADORA DE CAFE", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "F.F.T COLOMBIA S.A.S", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA", CIR: "SOACHI", CAPSULAS: "SERVICIO" } },
+      { nombre: "CATA CAFE EXPORT SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "LA TOSTADORA S.A.S.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL", TORREFACCION: "BOGOTA", CAPSULAS: "SERVICIO" } },
+      { nombre: "TELMO J. DIAZ Y COMPAÑÍA S.A.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "EQUATION COFFEE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "MANTAGRO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "FEDERACION NACIONAL DE CACAOTEROS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "SARENI SAS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA", CIR: "SOACHI" } },
+      { nombre: "LA GUFANDA SAS", codigo: 1, servicios: { TORREFACCION: "BOGOTA" } },
+      { nombre: "GAVICO SAS", codigo: 1, servicios: { TORREFACCION: "BOGOTA" } },
+      { nombre: "FONDO LEGADO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "RODRIGUEZ & MURILLAS TRADING SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "MEDELLIN OF PRINCIPAL" } },
+      { nombre: "D`ORIGENN S.A.S.", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "LUSITANIA COFFEE COMPANY S.A.S", codigo: 2, servicios: { "CALIDADES - ENSAYOS": "SOACHI", "CALIDADES ALAO": "SOACHI" } },
+      { nombre: "ASOCIACIÓN COLOMBIANA PARA LA EXCELENCIA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL", ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "VALENCIA EXPORT S.A.S", codigo: 1, servicios: { TORREFACCION: "BOGOTA" } },
+      { nombre: "FINCA DON TULIO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "CAFE DEVOTION S.A.S.", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "INTERNATIONAL MARKET INTELIGENCE S A S", codigo: 1, servicios: { TORREFACCION: "BOGOTA" } },
+      { nombre: "IMPORTADORA JUMBO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "FINCA TEMATICA CAFETERA LAS MERCEDES", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL" } },
+      { nombre: "AMBERA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, OF PRINCIPAL" } },
+      { nombre: "TEAM TAP S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "SANTAMARTA" } },
+      { nombre: "SUPRACAFE COLOMBIA SA", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "DISTRIBUIDORA TOYOTA SAS", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE, NEIVA, PASTO" } },
+      { nombre: "LOGISTICA GLOBAL DE NARIÑO LGN S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "PASTO" } },
+      { nombre: "PROMOTORA CAFE DE ALTURA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "PASTO MOTORS S.A.S", codigo: 1, servicios: { ALMACENAMIENTO: "PASTO" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DEL OCCIDENTE", codigo: 1, servicios: { ALMACENAMIENTO: "PASTO" } },
+      { nombre: "COOPERATIVA MULTIACTIVA DE CAFETERO", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "CI ORIGENES COFFEE SAS ZOMAC", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "CABLES COLOMBIA URIBE Y CIA S.C.A.", codigo: 1, servicios: { ALMACENAMIENTO: "BUCARAMANGA" } },
+      { nombre: "CARLIXPLAST S.A.S.", codigo: 1, servicios: { ALMACENAMIENTO: "BUCARAMANGA" } },
+      { nombre: "TEJIDOS SINTETICOS DE COLOMBIA S.A. - TESICOL", codigo: 1, servicios: { ALMACENAMIENTO: "BUCARAMANGA" } },
+      { nombre: "CAFE DE LA TORRE SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "NATUFEED COFFEE COMPANY SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "COOPERATIVA CAFETERA DEL NORORIENTE", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES SANTANDER", codigo: 2, servicios: { TRILLA: "SANTANDER", CAPSULAS: "SERVICIO" } },
+      { nombre: "CAFE HACIENDA CASABLANCA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "OFICINA INTERNACIONAL DEL TRABAJO", codigo: 1, servicios: { CIR: "NEIVA" } },
+      { nombre: "INTEGRALES DEL HUILA SAS", codigo: 1, servicios: { CIR: "NEIVA" } },
+      { nombre: "APU SAS", codigo: 1, servicios: { CIR: "NEIVA" } },
+      { nombre: "MEMORY'S CAFE SAS", codigo: 1, servicios: { CIR: "NEIVA" } },
+      { nombre: "CALPINE ENTERPRISES ZONA FRANCA", codigo: 2, servicios: { ALMACENAMIENTO: "NEIVA", "OPERACION LOGISTICA": "NEIVA" } },
+      { nombre: "COOPERATIVA CENTRAL DE CAFICULTORES DEL HUILA", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", CIR: "SOACHI" } },
+      { nombre: "MANIWA COFFEE SAS", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", TRILLA: "NEIVA", CAPSULAS: "SERVICIO" } },
+      { nombre: "COOPERATIVA DEPARTAMENTAL DEL HUILA", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL", "CALIDADES - ENSAYOS": "SOACHI", "CALIDADES ALAO": "SOACHI" } },
+      { nombre: "OSITO COLOMBIA S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA", "CALIDADES ALAO": "SOACHI" } },
+      { nombre: "COMPAÑIA COLOMBIANA AGRICOLA", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA", TRILLA: "NEIVA" } },
+      { nombre: "DISTRILICORES DEL TOLIMA SAS", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "ROOTT + CO S.A.S.", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "CASA TORO S.A.", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "INC CORPORATE SAS", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "LA FINCA FOODS S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DEL SUR DEL TOLIMA", codigo: 2, servicios: { ALMACENAMIENTO: "IBAGUE", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CAFE 100 AÑOS SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "SANTAMARTA" } },
+      { nombre: "COOPERATIVA DE CAFICULTORES DEL LIBANO", codigo: 1, servicios: { ALMACENAMIENTO: "IBAGUE" } },
+      { nombre: "EMBRUJO CAFÉ ZOMAC S.A.S.", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "INVERSORA ARCILAZA S.A.S.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "COMPAÑIA CAFETERA MONARCA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL" } },
+      { nombre: "GRUPO UMA VC S.A.S.", codigo: 1, servicios: { "OPERACION LOGISTICA": "ARMENIA" } },
+      { nombre: "YOLIS WB S.A.S.", codigo: 1, servicios: { "OPERACION LOGISTICA": "ARMENIA" } },
+      { nombre: "COMPAÑIA NACIONAL DEL CAFÉ S.A.S", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, SANTAMARTA" } },
+      { nombre: "COMPAÑÍA CAFETERA LA MESETA S.A.", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "SIRUMA COFFEE S.A.S.", codigo: 3, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL", "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL", TRILLA: "MANIZALES" } },
+      { nombre: "AZAHAR COFFEE COMPANY S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, MEDELLIN, OF PRINCIPAL", CAPSULAS: "SERVICIO" } },
+      { nombre: "ALTOS DEL TIO CONEJO S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL", TRILLA: "MANIZALES" } },
+      { nombre: "VERTICAL COFFEE CO SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, MEDELLIN, OF PRINCIPAL" } },
+      { nombre: "BELCO COLOMBIA SAS", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, OF PRINCIPAL, SANTAMARTA" } },
+      { nombre: "CAFE KUMANDAY SAS", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "FRUTY GREEN PACKING S.A.S.", codigo: 1, servicios: { ALMACENAMIENTO: "PEREIRA" } },
+      { nombre: "LOLO COFFEE GROUP & CIA SCA", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "CARTAGENA" } },
+      { nombre: "SUCDEN SERVICIOS SAS", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "VILLA CLARA IMPORTACIONES Y", codigo: 1, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA" } },
+      { nombre: "CONGALES ECHEVERRI Y CIA S.C.A.", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "CAFEZAM SAS", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "COMERCIALIZADORA LA VEREDA S.A.S", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "BOTERO Y BOTERO SAS", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "DULCE MISTERIO S.A.S BIC", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "RODRIGUEZ CASTRO AGRICULTURA S.A.S", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "FLOR A FRUTO S.A.S.", codigo: 1, servicios: { TRILLA: "MANIZALES" } },
+      { nombre: "ALMA BATERO S.A.S", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "BUENAVENTURA, CARTAGENA, MEDELLIN, OF PRINCIPAL, SANTAMARTA", TRILLA: "MANIZALES" } },
+      { nombre: "ALMACAFÉ PROYECTOS", codigo: 2, servicios: { "AGENCIAMIENTO ADUANERO": "OF PRINCIPAL", "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS gerencia comercial", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS Gestion gremial", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS Craft", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS propiedad intelectual", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS Mercadeo y publicidad", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS Desarrollo social", codigo: 1, servicios: { "CALIDADES ALAO": "OF PRINCIPAL" } },
+      { nombre: "TORRECAFÉ AGUILA ROJA", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CAFICAUCA", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "CAFÉ DEVOTION", codigo: 1, servicios: { "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": "OF PRINCIPAL" } },
+      { nombre: "VIVE CAFÉ S.A BIC", codigo: 2, servicios: { "CALIDADES ALAO": "SOACHI", CAPSULAS: "SERVICIO" } },
+      { nombre: "EXPOCAFÉ", codigo: 1, servicios: { "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "SKN", codigo: 1, servicios: { "CALIDADES - ENSAYOS": "OF PRINCIPAL" } },
+      { nombre: "ASOCIACIÓN DE PEQUEÑOS CAFETEROS DE QUINCHÍA - APECAFEQ", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "BANCA EXPORTADORA S.A. - BANEXPORT", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "CAFE HACIENDA CASABLANCA SAS (CIR)", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "COFFEE EXPORT Y CIA S EN C CI", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "COOPERATIVA CENTRAL DE CAFICULTORES DEL HUILA - COOCENTRAL", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "COOPERATIVA DEPARTAMENTAL DE CAFETEROS DEL HUILA LTDA", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "EXPOCAFÉ S.A.", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "FEDERACIÓN NACIONAL DE CAFETEROS DE COLOMBIA (FNC)", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "LA DIVISA SAS", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "PROMOTORA DE CAFÉ COLOMBIA S.A. - PROCAFECOL", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "VIVE CAFE S.A. (CIR)", codigo: 1, servicios: { CIR: "SOACHI" } },
+      { nombre: "CYV COFFEE SAS", codigo: 1, servicios: { CAPSULAS: "SERVICIO" } },
+    ];
+
+    // PREGUNTAS por línea de servicio
+    const PREGUNTAS = {
+      "AGENCIAMIENTO ADUANERO": {
+        icono: "⚓",
+        nombre: "Agenciamiento Aduanero",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la revisión previa, la asesoría documental, el diligenciamiento y la claridad de los requisitos para sus trámites?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la agilidad en la gestión de levantes, nacionalizaciones y trámites de importación o exportación?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la claridad, oportunidad y seguimiento de la información brindada sobre el estado de sus procesos en tiempo real?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la representación, gestión ante entidades de control (DIAN, VUCE, Policía Antinarcóticos, ICA/INVIMA) y el acompañamiento brindado frente a cambios normativos o situaciones imprevistas en la operación?" },
+          { tipo: "abierta", texto: "¿En qué aspecto específico cree que podríamos innovar o mejorar para facilitar sus procesos de comercio exterior?" },
+        ]
+      },
+      "ALMACENAMIENTO": {
+        icono: "🏭",
+        nombre: "Almacenamiento",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con las condiciones de conservación, seguridad y cuidado de su producto dentro de las instalaciones de Almacafé?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la disponibilidad, acceso y trazabilidad de su inventario o mercancía?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la gestión documental, certificados y comunicación sobre el estado de sus pedidos o inventarios?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la preparación, alistamiento, precisión y calidad del ensaque o empaque de sus pedidos?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la velocidad de despacho, puntualidad en la entrega y coordinación logística con su operación comercial?" },
+          { tipo: "abierta", texto: "¿Qué mejoras sugiere en la gestión, almacenamiento o logística de su producto con Almacafé?" },
+        ]
+      },
+      "CALIDADES - CALIBRACIÓN Y MANTENIMIENTO": {
+        icono: "🔧",
+        nombre: "Mantenimiento y Calibración de Medidores",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la precisión de la calibración realizada?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la rapidez del servicio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la claridad del diagnóstico entregado?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la confiabilidad de los equipos después del servicio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la asesoría técnica recibida?" },
+          { tipo: "abierta", texto: "¿Qué aspectos del servicio de calibración, diagnóstico o asesoría técnica considera que podemos mejorar?" },
+        ]
+      },
+      "CALIDADES - ENSAYOS": {
+        icono: "🧪",
+        nombre: "Evaluación de Calidad de Café",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la confiabilidad de los resultados?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con los tiempos de entrega de informes?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la claridad y utilidad del reporte técnico?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el soporte brindado por el laboratorio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la precisión de los ensayos y análisis realizados?" },
+          { tipo: "abierta", texto: "¿Qué podríamos mejorar en nuestros análisis, reportes o acompañamiento técnico para aportarle más valor?" },
+        ]
+      },
+      "CALIDADES ALAO": {
+        icono: "🌿",
+        nombre: "Evaluación de Calidad (ALAO)",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la confiabilidad de los resultados?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con los tiempos de entrega de informes?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la claridad y utilidad del reporte técnico?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el soporte brindado por el laboratorio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la precisión de los ensayos y análisis realizados?" },
+        ]
+      },
+      "CIR": {
+        icono: "📦",
+        nombre: "Almacenamiento – CIR",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con las condiciones de conservación, seguridad y cuidado de su producto dentro de las instalaciones de Almacafé?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la disponibilidad, acceso y trazabilidad de su inventario o mercancía?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la gestión documental, certificados y comunicación sobre el estado de sus pedidos o inventarios?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la preparación, alistamiento, precisión y calidad del ensaque o empaque de sus pedidos?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la velocidad de despacho, puntualidad en la entrega y coordinación logística con su operación comercial?" },
+        ]
+      },
+      "TRILLA": {
+        icono: "☕",
+        nombre: "Trilla",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el proceso de trilla y con el cumplimiento de los estándares de calidad que usted requiere para su café?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la consistencia del resultado obtenido?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el cumplimiento de las especificaciones acordadas?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con los tiempos de entrega?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el cuidado y manejo del grano durante el proceso?" },
+        ]
+      },
+      "OPERACION LOGISTICA": {
+        icono: "🚛",
+        nombre: "Transporte Nacional / Internacional",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con los tiempos de gestión del transporte (recolección, tránsito y entrega)?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la trazabilidad y seguimiento de la carga?" },
+          { tipo: "nps", texto: "En caso de incidentes, ¿cómo calificaría nuestra capacidad y velocidad de respuesta?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la coordinación operativa del servicio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la comunicación ante novedades o retrasos?" },
+          { tipo: "abierta", texto: "¿Hay algún aspecto específico de nuestros aliados estratégicos (transporte internacional y transporte nacional) que considere que debamos reforzar para mejorar su experiencia?" },
+        ]
+      },
+      "TORREFACCION": {
+        icono: "🔥",
+        nombre: "Torrefacción",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el perfil de tostión logrado?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la consistencia entre lotes?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la molienda y presentación final del producto?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la calidad del empaque?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el cumplimiento de tiempos de entrega?" },
+          { tipo: "abierta", texto: "¿Qué ajustes o mejoras considera necesarios en el proceso de tostión, molienda o entrega de su producto?" },
+        ]
+      },
+      "ALMACAFÉ CARGO": {
+        icono: "🚢",
+        nombre: "Almacafé Cargo",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con los tiempos de gestión del transporte (recolección, tránsito y entrega)?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la trazabilidad y seguimiento de la carga?" },
+          { tipo: "nps", texto: "En caso de incidentes, ¿cómo calificaría nuestra capacidad y velocidad de respuesta?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la coordinación operativa del servicio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la comunicación ante novedades o retrasos?" },
+        ]
+      },
+      "CAPSULAS": {
+        icono: "💊",
+        nombre: "Maquila / Cápsulas",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la calidad del producto final?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la consistencia entre lotes?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la calidad de mezcla y ensaque?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el cumplimiento de especificaciones?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la capacidad de respuesta frente a ajustes o requerimientos?" },
+          { tipo: "abierta", texto: "¿Qué ajustes o mejoras considera necesarios en la calidad, consistencia o respuesta a sus requerimientos?" },
+        ]
+      },
+      "DISEÑO DE PRODUCTO": {
+        icono: "🎨",
+        nombre: "Diseño de Producto / Industrialización Regional",
+        preguntas: [
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el acompañamiento en el desarrollo del producto?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el valor agregado que aporta Almacafé a su negocio?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la capacidad de personalización de la solución?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con la innovación aplicada al producto?" },
+          { tipo: "nps", texto: "¿Qué tan satisfecho está con el apoyo para llegar a mercados especializados?" },
+          { tipo: "abierta", texto: "¿Qué recomendaciones tiene para mejorar el desarrollo, personalización o innovación de su producto?" },
+        ]
+      },
+    };
+
+    // ===== STATE =====
+    let selectedEmpresa = null;
+    let serviciosEmpresa = [];
+    let surveyIndex = 0;      // which service we're on
+    let questionIndex = 0;    // which question within the service
+    let respuestas = {};
+
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxQ95FYfkz8bBtlhXFiMdzmexWHVpRW3u5ipCzOf4j4JdGkUnMuKc350nJ3FU0Nfu--Pg/exec";
+
+    // ===== ALREADY ANSWERED CHECK =====
+    function getAnswered() {
+      try { return JSON.parse(localStorage.getItem('nps_answered') || '[]'); } catch { return []; }
+    }
+    function markAnswered(nombre) {
+      const list = getAnswered();
+      if (!list.includes(nombre)) { list.push(nombre); localStorage.setItem('nps_answered', JSON.stringify(list)); }
+    }
+    function hasAnswered(nombre) { return getAnswered().includes(nombre); }
+
+    // ===== STEP 1: EMPRESA =====
+    const searchInput = document.getElementById('searchInput');
+    const dropdown = document.getElementById('dropdown');
+
+    searchInput.addEventListener('input', function () {
+      const q = this.value.trim().toLowerCase();
+      if (!q) { dropdown.classList.remove('open'); return; }
+      const results = EMPRESAS.filter(e => e.nombre.toLowerCase().includes(q)).slice(0, 15);
+      if (!results.length) {
+        dropdown.innerHTML = '<div class="dropdown-item" style="color:var(--text-muted)">No se encontraron resultados</div>';
+      } else {
+        dropdown.innerHTML = results.map(e => {
+          const highlighted = e.nombre.replace(new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'), '<mark>$1</mark>');
+          const done = hasAnswered(e.nombre);
+          return `<div class="dropdown-item${done ? ' selected' : ''}" onclick="selectEmpresa('${e.nombre.replace(/'/g, "\\'")}')">${highlighted}${done ? ' ✓' : ''}</div>`;
+        }).join('');
+      }
+      dropdown.classList.add('open');
+    });
+
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.search-wrap')) dropdown.classList.remove('open');
+    });
+
+    searchInput.addEventListener('focus', function () {
+      if (this.value.trim()) dropdown.classList.add('open');
+    });
+
+    function selectEmpresa(nombre) {
+      const emp = EMPRESAS.find(e => e.nombre === nombre);
+      if (!emp) return;
+      selectedEmpresa = emp;
+      serviciosEmpresa = Object.keys(emp.servicios);
+      searchInput.value = nombre;
+      dropdown.classList.remove('open');
+
+      document.getElementById('selectedName').textContent = nombre;
+      document.getElementById('selectedInfo').style.display = 'block';
+      document.getElementById('servicesTags').innerHTML = serviciosEmpresa.map(s =>
+        `<span class="tag">${s}</span>`
+      ).join('');
+      document.getElementById('errorEmpresa').classList.remove('show');
+      document.getElementById('alreadyWarning').style.display = 'none';
+    }
+
+    function clearEmpresa() {
+      selectedEmpresa = null;
+      serviciosEmpresa = [];
+      searchInput.value = '';
+      document.getElementById('selectedInfo').style.display = 'none';
+      document.getElementById('alreadyWarning').style.display = 'none';
+    }
+
+    function goStep2() {
+      if (!selectedEmpresa) {
+        document.getElementById('errorEmpresa').classList.add('show');
+        return;
+      }
+      document.getElementById('step1').style.display = 'none';
+      surveyIndex = 0;
+      questionIndex = 0;
+      respuestas = {};
+      renderQuestion();
+    }
+
+    // ===== QUESTION BY QUESTION =====
+    function getValidServices() {
+      return serviciosEmpresa.filter(k => PREGUNTAS[k]);
+    }
+
+    function renderQuestion() {
+      const services = getValidServices();
+      if (surveyIndex >= services.length) { submitSurvey(); return; }
+
+      const key = services[surveyIndex];
+      const def = PREGUNTAS[key];
+      const preguntas = def.preguntas;
+
+      if (questionIndex >= preguntas.length) {
+        surveyIndex++;
+        questionIndex = 0;
+        renderQuestion();
+        return;
+      }
+
+      const p = preguntas[questionIndex];
+      const totalServices = services.length;
+      const totalQInService = preguntas.length;
+
+      // Global progress: count all answered questions
+      let totalQ = 0, doneQ = 0;
+      services.forEach((k, si) => {
+        const qs = PREGUNTAS[k].preguntas;
+        totalQ += qs.length;
+        if (si < surveyIndex) doneQ += qs.length;
+        else if (si === surveyIndex) doneQ += questionIndex;
+      });
+      const pct = Math.round((doneQ / totalQ) * 100);
+
+      // Q dots for current service
+      const dots = preguntas.map((_, i) => {
+        let cls = i < questionIndex ? 'done' : i === questionIndex ? 'current' : '';
+        return `<div class="q-counter-dot ${cls}"></div>`;
+      }).join('');
+
+      const saved = respuestas[`${key}_${questionIndex}`] ?? null;
+      const isLast = surveyIndex === totalServices - 1 && questionIndex === preguntas.length - 1;
+      const isFirstQ = surveyIndex === 0 && questionIndex === 0;
+
+      const step2 = document.getElementById('step2');
+      step2.style.display = 'block';
+      step2.innerHTML = `
+    <div class="card q-slide-in">
+      <div class="progress-wrap">
+        <div class="progress-info">
+          <span>Pregunta ${questionIndex + 1} de ${totalQInService}</span>
+          <span>${pct}%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div style="text-align:center; margin-bottom:24px; padding-bottom:20px; border-bottom:1px solid var(--cream-dark);">
+        <div style="font-size:2.4rem; margin-bottom:8px;">${def.icono}</div>
+        <div style="font-family:'Playfair Display',serif; font-size:1.5rem; font-weight:700; color:var(--blue-dark); line-height:1.2;">${def.nombre}</div>
+        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:6px;">${selectedEmpresa.nombre}</div>
+      </div>
+
+      <div class="q-counter">
+        <div class="q-counter-dots">${dots}</div>
+        <span>${questionIndex + 1} / ${totalQInService}</span>
+      </div>
+
+      ${renderSinglePregunta(p, key, questionIndex, saved)}
+
+      <div id="errorQ" class="error-msg" style="margin-top:12px;">Por favor responde esta pregunta para continuar.</div>
+
+      <div class="btn-row">
+        ${!isFirstQ ? `<button class="btn btn-secondary" onclick="prevQuestion()">← Atrás</button>` : ''}
+        <button class="btn btn-primary" onclick="nextQuestion()">
+          ${isLast ? 'Finalizar ✓' : 'Siguiente →'}
+        </button>
+      </div>
+    </div>
+  `;
+    }
+
+    function renderSinglePregunta(p, key, idx, saved) {
+      if (p.tipo === 'nps') {
+        const btns = Array.from({ length: 10 }, (_, i) => i + 1).map(n => {
+          const sel = saved == n ? ' selected' : '';
+          return `<button class="nps-btn${sel}" onclick="selectNPS('${key}',${idx},${n},this)">${n}</button>`;
+        }).join('');
+        return `
+      <div class="nps-block">
+        <div class="nps-question">${p.texto}</div>
+        <div class="nps-scale">${btns}</div>
+        <div class="nps-labels">
+          <span>Muy insatisfecho</span>
+          <span>Neutral</span>
+          <span>Muy satisfecho</span>
+        </div>
+      </div>`;
+      } else {
+        return `
+      <div class="open-q">
+        <label>${p.texto}</label>
+        <textarea id="openAnswer" placeholder="Escribe tu respuesta aquí..." oninput="saveText('${key}',${idx},this.value)">${saved || ''}</textarea>
+      </div>`;
+      }
+    }
+
+    function selectNPS(key, idx, val, btn) {
+      const parent = btn.closest('.nps-scale');
+      parent.querySelectorAll('.nps-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      respuestas[`${key}_${idx}`] = val;
+      document.getElementById('errorQ').classList.remove('show');
+    }
+
+    function saveText(key, idx, val) {
+      respuestas[`${key}_${idx}`] = val;
+    }
+
+    function nextQuestion() {
+      const services = getValidServices();
+      const key = services[surveyIndex];
+      const def = PREGUNTAS[key];
+      const p = def.preguntas[questionIndex];
+      const v = respuestas[`${key}_${questionIndex}`];
+
+      // Validate current question
+      if (p.tipo === 'nps' && !v) {
+        document.getElementById('errorQ').classList.add('show');
+        return;
+      }
+      if (p.tipo === 'abierta' && (!v || !v.toString().trim())) {
+        document.getElementById('errorQ').classList.add('show');
+        return;
+      }
+
+      questionIndex++;
+      renderQuestion();
+    }
+
+    function prevQuestion() {
+      if (questionIndex > 0) {
+        questionIndex--;
+      } else if (surveyIndex > 0) {
+        surveyIndex--;
+        const services = getValidServices();
+        questionIndex = PREGUNTAS[services[surveyIndex]].preguntas.length - 1;
+      }
+      renderQuestion();
+    }
+
+    function submitSurvey() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('successCard').style.display = 'block';
+
+      fetch("https://script.google.com/macros/s/AKfycbxQ95FYfkz8bBtlhXFiMdzmexWHVpRW3u5ipCzOf4j4JdGkUnMuKc350nJ3FU0Nfu--Pg/exec", {
+        method: "POST",
+        mode: "no-cors",
+        body: JSON.stringify({
+          empresa: selectedEmpresa.nombre,
+          respuestas: respuestas
+        })
+      });
+    }
+  </script>
+</body>
+
+</html>
