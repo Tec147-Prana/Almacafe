@@ -339,35 +339,53 @@
       transition: all 0.18s;
     }
 
-    @media (max-width: 420px) {
+    @media (max-width: 480px) {
       .nps-scale {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
-        gap: 6px;
+        gap: 5px;
       }
 
       .nps-btn {
-        height: 52px;
-        font-size: 1rem;
+        height: 44px;
+        font-size: 0.95rem;
         border-radius: 10px;
         min-width: unset;
       }
 
       .nps-labels {
-        font-size: 0.68rem;
+        font-size: 0.65rem;
       }
 
       .container {
-        padding: 20px 14px 60px;
+        padding: 16px 12px 60px;
       }
 
       .card {
-        padding: 20px 16px;
+        padding: 18px 14px;
       }
 
       .btn {
         font-size: 0.95rem;
-        padding: 14px 16px;
+        padding: 13px 16px;
+      }
+
+      .nps-question {
+        font-size: 0.9rem;
+      }
+
+      .service-header h3,
+      div[style*="Playfair Display"] {
+        font-size: 1.2rem !important;
+      }
+
+      .progress-info {
+        font-size: 0.72rem;
+      }
+
+      .q-counter {
+        font-size: 0.72rem;
+        margin-bottom: 14px;
       }
     }
 
@@ -688,6 +706,37 @@
       padding: 3px 12px;
     }
 
+    .transition-card {
+      text-align: center;
+      padding: 48px 32px;
+    }
+
+    .transition-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .transition-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--blue-dark);
+      margin-bottom: 8px;
+    }
+
+    .transition-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      line-height: 1.5;
+    }
+
+    .transition-card .next-label {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      margin: 16px 0 24px;
+    }
+
     .already-banner {
       background: rgba(21, 101, 192, 0.07);
       border: 1.5px solid rgba(21, 101, 192, 0.2);
@@ -827,6 +876,10 @@
 
     <!-- STEP 2+: ENCUESTAS -->
     <div id="step2" style="display:none;"></div>
+
+    <!-- TRANSITION -->
+    <div id="transitionCard" style="display:none;" class="card slide-in" style="text-align:center;">
+    </div>
 
     <!-- SUCCESS -->
     <div id="successCard" style="display:none;" class="card success-card slide-in">
@@ -1276,6 +1329,30 @@
       return serviciosEmpresa.filter(k => PREGUNTAS[k]);
     }
 
+    function showTransition(completedName, completedIcon, nextName, nextIcon, nextNumber, total) {
+      document.getElementById('step2').style.display = 'none';
+      const tc = document.getElementById('transitionCard');
+      tc.style.display = 'block';
+      tc.className = 'card slide-in';
+      tc.innerHTML = `
+    <div class="transition-card">
+      <div class="transition-icon">🎉</div>
+      <h2>¡Encuesta completada!</h2>
+      <p>Terminaste la encuesta de <strong>${completedIcon} ${completedName}</strong></p>
+      <div class="next-label">
+        A continuación: ${nextIcon} ${nextName}
+        <br><small style="font-weight:400; color:var(--text-muted);">Encuesta ${nextNumber} de ${total}</small>
+      </div>
+      <button class="btn btn-primary" style="width:100%;" onclick="continueToNext()">Continuar →</button>
+    </div>
+  `;
+    }
+
+    function continueToNext() {
+      document.getElementById('transitionCard').style.display = 'none';
+      renderQuestion();
+    }
+
     function renderQuestion() {
       const services = getValidServices();
       if (surveyIndex >= services.length) { submitSurvey(); return; }
@@ -1285,8 +1362,21 @@
       const preguntas = def.preguntas;
 
       if (questionIndex >= preguntas.length) {
+        const completedKey = services[surveyIndex];
+        const completedDef = PREGUNTAS[completedKey];
         surveyIndex++;
         questionIndex = 0;
+
+        if (surveyIndex < services.length) {
+          const nextKey = services[surveyIndex];
+          const nextDef = PREGUNTAS[nextKey];
+          showTransition(
+            completedDef.nombre, completedDef.icono,
+            nextDef.nombre, nextDef.icono,
+            surveyIndex + 1, services.length
+          );
+          return;
+        }
         renderQuestion();
         return;
       }
