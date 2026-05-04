@@ -850,6 +850,16 @@
 
       <div id="errorEmpresa" class="error-msg">Por favor selecciona tu empresa para continuar.</div>
 
+      <div id="nombreWrap" style="display:none; margin-top:20px;">
+        <label style="display:block; font-size:0.97rem; font-weight:500; color:var(--text); margin-bottom:8px;">¿Cuál es
+          tu nombre?</label>
+        <input type="text" id="nombreInput" placeholder="Escribe tu nombre completo..."
+          style="width:100%; padding:14px 18px; border:2px solid var(--cream-dark); border-radius:12px; font-family:'DM Sans',sans-serif; font-size:1rem; color:var(--text); background:var(--cream); outline:none; transition:border-color 0.2s, box-shadow 0.2s;"
+          onfocus="this.style.borderColor='var(--blue)'; this.style.boxShadow='0 0 0 4px rgba(21,101,192,0.08)'; this.style.background='var(--white)'"
+          onblur="this.style.borderColor='var(--cream-dark)'; this.style.boxShadow='none'; this.style.background='var(--cream)'" />
+        <div id="errorNombre" class="error-msg">Por favor escribe tu nombre para continuar.</div>
+      </div>
+
       <div id="selectedInfo" style="display:none;">
         <div id="selectedBadge" class="selected-badge">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
@@ -1329,6 +1339,7 @@
       ).join('');
       document.getElementById('errorEmpresa').classList.remove('show');
       document.getElementById('alreadyWarning').style.display = 'none';
+      document.getElementById('nombreWrap').style.display = 'block';
     }
 
     function clearEmpresa() {
@@ -1337,6 +1348,8 @@
       searchInput.value = '';
       document.getElementById('selectedInfo').style.display = 'none';
       document.getElementById('alreadyWarning').style.display = 'none';
+      document.getElementById('nombreWrap').style.display = 'none';
+      document.getElementById('nombreInput').value = '';
     }
 
     function goStep2() {
@@ -1344,6 +1357,13 @@
         document.getElementById('errorEmpresa').classList.add('show');
         return;
       }
+      const nombre = document.getElementById('nombreInput').value.trim();
+      if (!nombre) {
+        document.getElementById('errorNombre').classList.add('show');
+        return;
+      }
+      document.getElementById('errorNombre').classList.remove('show');
+      window.nombreRespondente = nombre;
       document.getElementById('step1').style.display = 'none';
       surveyIndex = 0;
       questionIndex = 0;
@@ -1544,6 +1564,7 @@
         mode: "no-cors",
         body: JSON.stringify({
           empresa: selectedEmpresa.nombre,
+          nombre: window.nombreRespondente || '',
           respuestas: respuestas
         })
       });
